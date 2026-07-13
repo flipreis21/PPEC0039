@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Felipe Reis da Cruz"
+
+  navbar:
+    pinned: true
+    collapse-below: md
+    background: "#ffffff"
+    foreground: "#1f2937"
+
+    right:
+      - href: index.qmd
+        text: Início
+
+      - href: lista_disciplina.qmd
+        text: Aulas
+
+      - href: about.qmd
+        text: Sobre
+
+  page-footer:
+    center: "Felipe Reis da Cruz · Página acadêmica desenvolvida com Quarto"
+
+format:
+  html:
+    theme: litera
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    smooth-scroll: true
+    code-fold: true
+    code-summary: "Visualizar código"
+    code-copy: true
+    code-overflow: wrap
+
+execute:
+  freeze: auto
+
+lang: pt-BR

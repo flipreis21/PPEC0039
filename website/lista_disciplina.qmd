@@ -1,0 +1,15 @@
+---
+title: "PPEC0039 — Estatística e Planejamento de Experimentos"
+description: "Notebooks e atividades desenvolvidos durante a disciplina."
+
+listing:
+  contents:
+    - "notebooks/*.ipynb"
+  type: grid
+  categories: true
+  sort-ui: true
+  filter-ui: true
+  page-size: 12
+---
+
+Nesta página estão reunidos os notebooks produzidos durante a disciplina e aulas selecionadas de colegas de outras equipes.

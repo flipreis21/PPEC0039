@@ -1,0 +1,29 @@
+---
+title: "Sobre a disciplina"
+description: "Uma avaliação do processo de aprendizagem na disciplina PPEC0039 — Estatística e Planejamento de Experimentos."
+toc: false
+---
+
+## Avaliação da experiência de aprendizagem
+
+A disciplina **PPEC0039 — Estatística e Planejamento de Experimentos** contribuiu de forma significativa para ampliar minha compreensão sobre o papel da estatística na produção e na interpretação do conhecimento científico. Ao longo das aulas, os conteúdos foram apresentados de maneira progressiva, partindo de fundamentos como amostragem, distribuições de probabilidade e estimação de parâmetros até chegar a técnicas mais estruturadas, como testes de hipóteses, análise de variância, regressão linear e planejamento de experimentos.
+
+Um dos principais aprendizados foi compreender que a análise estatística não se resume à aplicação automática de fórmulas ou funções computacionais. A escolha de um método deve estar relacionada ao problema investigado, às características dos dados e aos pressupostos necessários para que os resultados sejam considerados válidos. Nesse sentido, os estudos sobre normalidade, homocedasticidade, significância estatística, correlação e análise de resíduos foram importantes para desenvolver uma postura mais crítica diante dos resultados.
+
+A utilização de **Python e Jupyter Notebook** tornou o aprendizado mais prático e favoreceu a integração entre teoria, programação e interpretação. A construção dos notebooks exigiu não apenas a execução dos códigos, mas também a organização das etapas da análise, a explicação dos procedimentos adotados e a apresentação dos resultados por meio de tabelas e gráficos. Isso contribuiu para fortalecer princípios de transparência, documentação e reprodutibilidade das análises.
+
+A produção colaborativa das aulas também foi um aspecto positivo. O contato com notebooks elaborados por outros estudantes permitiu observar diferentes formas de organizar conteúdos, desenvolver códigos e explicar conceitos estatísticos. Essa diversidade mostrou que uma mesma temática pode ser abordada por perspectivas distintas, favorecendo a troca de conhecimentos e o aprendizado coletivo.
+
+Do ponto de vista crítico, alguns conteúdos apresentaram um nível elevado de abstração e exigiram maior dedicação para relacionar a fundamentação matemática com sua aplicação computacional. Entretanto, essa dificuldade foi produtiva, pois evidenciou a necessidade de compreender os conceitos antes de interpretar os resultados fornecidos pelas ferramentas. Uma ampliação futura do número de exemplos associados a situações reais da Engenharia Civil e das geotecnologias poderia tornar essa integração ainda mais evidente.
+
+## Relação com minha área de atuação
+
+Como profissional da área de geotecnologias e estudante do PPEC, identifico diversas possibilidades de aplicação dos conhecimentos adquiridos. Técnicas de amostragem, correlação, regressão e planejamento experimental podem ser utilizadas na avaliação da qualidade de dados geoespaciais, na comparação de métodos de levantamento, na análise de fenômenos territoriais e no desenvolvimento de pesquisas que envolvam variáveis ambientais, urbanas e socioeconômicas.
+
+A disciplina também reforçou a importância de planejar adequadamente uma pesquisa antes da coleta dos dados. A definição das variáveis, da unidade experimental, do tamanho da amostra, dos tratamentos e dos métodos de análise influencia diretamente a qualidade das conclusões obtidas.
+
+## Considerações finais
+
+De maneira geral, avalio a experiência na disciplina de forma positiva. Além dos conhecimentos estatísticos, desenvolvi maior familiaridade com programação, análise de dados e comunicação científica. A elaboração deste site com o **Quarto** representa uma síntese desse processo, reunindo os notebooks produzidos durante o curso em um ambiente organizado, acessível e reprodutível.
+
+O aprendizado adquirido será importante para o desenvolvimento da minha pesquisa acadêmica e para uma utilização mais consciente dos métodos estatísticos em atividades profissionais.

@@ -1,0 +1,87 @@
+---
+title: "Felipe Reis da Cruz"
+description: "Engenheiro Agrimensor e Cartógrafo, mestrando em Engenharia Civil com linha de pesquisa em Informações Espaciais, e profissional da área de geotecnologias, com interesse em análise espacial, bancos de dados geográficos e ciência de dados, possui experiência com bancos de dados geográficos, geocodificação, ET-EDGV, ET-ADGV, fiscalização de produtos aerofotogramétricos e programação para estudos geoespaciais.."
+
+image: imagens/felipe.jpg
+
+about:
+  template: trestles
+  image-shape: round
+
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: www.linkedin.com/in/felipe-reis-da-cruz
+
+
+
+    - icon: github
+      text: GitHub
+      href: https://github.com/flipreis21/
+
+
+
+    - icon: file-earmark-text
+      text: Currículo Lattes
+      href: http://lattes.cnpq.br/3236454899123649
+---
+## Apresentação
+
+Sou Engenheiro Agrimensor e Cartógrafo formado pela Universidade Federal da Bahia — UFBA e atualmente desenvolvo atividades acadêmicas relacionadas à análise de dados, geocodificação, endereçamento, análise espacial e geoprocessamento.
+
+Minha trajetória profissional está concentrada na área de geotecnologias, envolvendo produção, processamento, análise e controle de qualidade de qualidade de dados geoespaciais, já atuei na Prefeitura de Municipal de Salvador e atualmente faço parte do Instituto de Tecnologias Geo-Sociais como Gestor de produtos.
+
+## Formação acadêmica
+
+### Mestrado em Engenharia Civil
+
+Atualmente curso mestrado em Engenharia Civil, com linha de pesquisa em Informações Espaciais aplicada ao tema de Geoodificação e Grades discretas. 
+
+### Engenharia de Agrimensura e Cartográfica
+
+**Universidade Federal da Bahia — UFBA**
+
+A formação proporcionou conhecimentos em cartografia, geodésia, topografia, sensoriamento remoto, sistemas de informações geográficas e bancos de dados espaciais.
+
+## Experiência profissional
+
+Possuo experiência em atividades relacionadas a:
+
+- processamento e controle de qualidade de dados geoespaciais;
+- elaboração e manutenção de bancos de dados geográficos;
+- análises espaciais com PostgreSQL e PostGIS;
+- utilização avançada do QGIS;
+- publicação e consumo de serviços geográficos;
+- correção de inconsistências geométricas e topológicas;
+- elaboração de produtos e documentos técnicos.
+
+## Competências técnicas
+
+| Área | Tecnologias e conhecimentos |
+|---|---|
+| Sistemas de Informações Geográficas | QGIS e GeoServer |
+| Bancos de dados | PostgreSQL, PostGIS e SQL |
+| Programação e análise de dados | Python e Jupyter Notebook |
+| Cartografia | Produção e controle de qualidade cartográfica |
+| Levantamentos | GNSS, estação total e topografia |
+| Desenho técnico | AutoCAD |
+| Geocódigos | Grades Discretas |
+
+## Interesses acadêmicos
+
+Meus principais interesses acadêmicos e profissionais incluem:
+
+- geotecnologias;
+- análise espacial;
+- ciência e visualização de dados;
+- bancos de dados geográficos;
+- estatística aplicada;
+- cartografia cadastral;
+- sistemas de endereçamento e geocodificação;
+- planejamento e gestão territorial.
+
+## Sobre este site
+
+Este site foi desenvolvido como atividade final da disciplina **PPEC0039 — Estatística e Planejamento de Experimentos**.
+
+A seção [Aulas](lista_disciplina.qmd) reúne notebooks produzidos durante a disciplina e materiais selecionados de outras equipes.
