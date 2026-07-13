@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Felipe Reis da Cruz">
+<meta name="description" content="Introdução à inferência estatística, estimação de parâmetros, intervalos de confiança e análise de correlação.">
+
+<title>Estimação de Parâmetros e Correlação – Felipe Reis da Cruz</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fba3472d0f8a2e145e84a3325e8b457d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-md " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Felipe Reis da Cruz</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Procurar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Alternar de navegação" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Início</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lista_disciplina.html"> 
+<span class="menu-text">Aulas</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">Sobre</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Nesta página</h2>
+   
+  <ul>
+  <li><a href="#inferência-estatística-e-estimação-de-parâmetros" id="toc-inferência-estatística-e-estimação-de-parâmetros" class="nav-link active" data-scroll-target="#inferência-estatística-e-estimação-de-parâmetros">Inferência Estatística e Estimação de Parâmetros</a>
+  <ul class="collapse">
+  <li><a href="#introdução-e-contextualização" id="toc-introdução-e-contextualização" class="nav-link" data-scroll-target="#introdução-e-contextualização">1. Introdução e Contextualização</a>
+  <ul class="collapse">
+  <li><a href="#conceitos-fundamentais-capítulo-10---bussab-morettin" id="toc-conceitos-fundamentais-capítulo-10---bussab-morettin" class="nav-link" data-scroll-target="#conceitos-fundamentais-capítulo-10---bussab-morettin">Conceitos Fundamentais (Capítulo 10 - Bussab &amp; Morettin)</a></li>
+  </ul></li>
+  <li><a href="#na-prática-parâmetro-vs.-estatística" id="toc-na-prática-parâmetro-vs.-estatística" class="nav-link" data-scroll-target="#na-prática-parâmetro-vs.-estatística">2. Na Prática: Parâmetro vs.&nbsp;Estatística</a></li>
+  <li><a href="#a-mágica-da-inferência-o-teorema-central-do-limite-tcl" id="toc-a-mágica-da-inferência-o-teorema-central-do-limite-tcl" class="nav-link" data-scroll-target="#a-mágica-da-inferência-o-teorema-central-do-limite-tcl">3. A Mágica da Inferência: O Teorema Central do Limite (TCL)</a></li>
+  <li><a href="#teoria-da-estimação-o-que-define-um-bom-estimador" id="toc-teoria-da-estimação-o-que-define-um-bom-estimador" class="nav-link" data-scroll-target="#teoria-da-estimação-o-que-define-um-bom-estimador">4. Teoria da Estimação: O que define um bom Estimador?</a>
+  <ul class="collapse">
+  <li><a href="#ausência-de-vício-ou-viés-unbiasedness" id="toc-ausência-de-vício-ou-viés-unbiasedness" class="nav-link" data-scroll-target="#ausência-de-vício-ou-viés-unbiasedness">1. Ausência de Vício ou Viés (Unbiasedness)</a></li>
+  <li><a href="#eficiência-variância-mínima" id="toc-eficiência-variância-mínima" class="nav-link" data-scroll-target="#eficiência-variância-mínima">2. Eficiência (Variância Mínima)</a></li>
+  <li><a href="#consistência" id="toc-consistência" class="nav-link" data-scroll-target="#consistência">3. Consistência</a></li>
+  <li><a href="#o-clássico-exemplo-teórico-a-variância-amostral-n-vs-n-1" id="toc-o-clássico-exemplo-teórico-a-variância-amostral-n-vs-n-1" class="nav-link" data-scroll-target="#o-clássico-exemplo-teórico-a-variância-amostral-n-vs-n-1">O Clássico Exemplo Teórico: A Variância Amostral (<span class="math inline">\(n\)</span> vs <span class="math inline">\(n-1\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#determinação-do-tamanho-mínimo-da-amostra" id="toc-determinação-do-tamanho-mínimo-da-amostra" class="nav-link" data-scroll-target="#determinação-do-tamanho-mínimo-da-amostra">5. Determinação do Tamanho Mínimo da Amostra</a>
+  <ul class="collapse">
+  <li><a href="#tamanho-da-amostra-para-estimar-a-média-mu" id="toc-tamanho-da-amostra-para-estimar-a-média-mu" class="nav-link" data-scroll-target="#tamanho-da-amostra-para-estimar-a-média-mu">1. Tamanho da Amostra para Estimar a Média (<span class="math inline">\(\mu\)</span>)</a></li>
+  <li><a href="#tamanho-da-amostra-para-estimar-uma-proporção-p" id="toc-tamanho-da-amostra-para-estimar-uma-proporção-p" class="nav-link" data-scroll-target="#tamanho-da-amostra-para-estimar-uma-proporção-p">2. Tamanho da Amostra para Estimar uma Proporção (<span class="math inline">\(p\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#aplicação-prática-inspeção-por-amostragem-em-dados-geoespaciais" id="toc-aplicação-prática-inspeção-por-amostragem-em-dados-geoespaciais" class="nav-link" data-scroll-target="#aplicação-prática-inspeção-por-amostragem-em-dados-geoespaciais">6. Aplicação Prática: Inspeção por Amostragem em Dados Geoespaciais</a>
+  <ul class="collapse">
+  <li><a href="#caso-1-estimação-do-erro-posicional-planimétrico-intervalo-de-confiança" id="toc-caso-1-estimação-do-erro-posicional-planimétrico-intervalo-de-confiança" class="nav-link" data-scroll-target="#caso-1-estimação-do-erro-posicional-planimétrico-intervalo-de-confiança">Caso 1: Estimação do Erro Posicional Planimétrico (Intervalo de Confiança)</a></li>
+  <li><a href="#caso-2-dimensionamento-amostral-para-feições-omissas-proporção" id="toc-caso-2-dimensionamento-amostral-para-feições-omissas-proporção" class="nav-link" data-scroll-target="#caso-2-dimensionamento-amostral-para-feições-omissas-proporção">Caso 2: Dimensionamento Amostral para Feições Omissas (Proporção)</a></li>
+  </ul></li>
+  <li><a href="#análise-de-correlação-e-medidas-de-associação" id="toc-análise-de-correlação-e-medidas-de-associação" class="nav-link" data-scroll-target="#análise-de-correlação-e-medidas-de-associação">5. Análise de Correlação e Medidas de Associação</a>
+  <ul class="collapse">
+  <li><a href="#diagramas-de-dispersão" id="toc-diagramas-de-dispersão" class="nav-link" data-scroll-target="#diagramas-de-dispersão">1. Diagramas de Dispersão</a></li>
+  <li><a href="#a-covariância-cxy" id="toc-a-covariância-cxy" class="nav-link" data-scroll-target="#a-covariância-cxy">2. A Covariância <span class="math inline">\(C(X,Y)\)</span></a></li>
+  <li><a href="#coeficiente-de-correlação-de-pearson-r" id="toc-coeficiente-de-correlação-de-pearson-r" class="nav-link" data-scroll-target="#coeficiente-de-correlação-de-pearson-r">3. Coeficiente de Correlação de Pearson (<span class="math inline">\(r\)</span>)</a></li>
+  <li><a href="#coeficiente-de-determinação-r2" id="toc-coeficiente-de-determinação-r2" class="nav-link" data-scroll-target="#coeficiente-de-determinação-r2">4. Coeficiente de Determinação (<span class="math inline">\(r^2\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#conclusão-da-aula" id="toc-conclusão-da-aula" class="nav-link" data-scroll-target="#conclusão-da-aula">6. Conclusão da Aula</a></li>
+  <li><a href="#fontes-e-referências-bibliográficas" id="toc-fontes-e-referências-bibliográficas" class="nav-link" data-scroll-target="#fontes-e-referências-bibliográficas">📚 Fontes e Referências Bibliográficas</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Estimação de Parâmetros e Correlação</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">PPEC0039</div>
+    <div class="quarto-category">Estatística</div>
+    <div class="quarto-category">Inferência Estatística</div>
+    <div class="quarto-category">Produção própria</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Introdução à inferência estatística, estimação de parâmetros, intervalos de confiança e análise de correlação.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-contents">
+             <p>Felipe Reis da Cruz </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Data de Publicação</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">18 de abril de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/flipreis21/PPEC0039/blob/main/Estima%C3%A7%C3%A3o_de_par%C3%A2metros_e_Correla%C3%A7%C3%A3o.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a></p>
+<section id="inferência-estatística-e-estimação-de-parâmetros" class="level1">
+<h1>Inferência Estatística e Estimação de Parâmetros</h1>
+<p>Bem-vindo a este notebook de estudos! Este material foi desenhado para ser uma aula prática e teórica sobre <strong>Estimação de Parâmetros e Correlação</strong>, com forte embasamento nos Capítulos 10 e 11 do livro <em><a href="https://www.professores.uff.br/jutriavaldes/wp-content/uploads/sites/196/2019/08/Book_EstatBas-Morettin-Bussab.pdf">Estatística Básica</a></em> (Bussab &amp; Morettin).</p>
+<section id="introdução-e-contextualização" class="level2">
+<h2 class="anchored" data-anchor-id="introdução-e-contextualização">1. Introdução e Contextualização</h2>
+<p>Até o momento em seus estudos de Estatística, você provavelmente lidou com duas áreas distintas: 1. <strong>Estatística Descritiva:</strong> Como organizar, resumir e visualizar um conjunto de dados que já temos em mãos. 2. <strong>Probabilidade:</strong> A base matemática que nos permite calcular a chance de eventos ocorrerem em cenários teóricos conhecidos.</p>
+<p>A <strong>Inferência Estatística</strong> (foco deste notebook) é a ponte que une esses dois mundos. No mundo real e no planejamento de experimentos, quase nunca temos acesso a todos os dados que gostaríamos de analisar. Seja por questões de custo, tempo ou impossibilidade física, não podemos testar todas as peças de uma fábrica, entrevistar todos os eleitores de um país ou aplicar um medicamento em todos os pacientes do mundo.</p>
+<p>O que fazemos? Nós coletamos uma <strong>amostra</strong> (uma parte representativa) e usamos as leis da probabilidade para fazer afirmações seguras sobre a <strong>população</strong> inteira.</p>
+<section id="conceitos-fundamentais-capítulo-10---bussab-morettin" class="level3">
+<h3 class="anchored" data-anchor-id="conceitos-fundamentais-capítulo-10---bussab-morettin">Conceitos Fundamentais (Capítulo 10 - Bussab &amp; Morettin)</h3>
+<p>Para que a nossa transição da amostra para a população seja cientificamente válida, precisamos estabelecer um vocabulário estatístico conhecido:</p>
+<ul>
+<li><strong>População:</strong> É o conjunto de todos os elementos que estamos interessados em estudar.</li>
+<li><strong>Amostra Aleatória Simples:</strong> É um subconjunto da população onde cada elemento foi retirado de forma independente e tinha exatamente a mesma chance de ser escolhido.</li>
+<li><strong>Parâmetro:</strong> É uma medida numérica descritiva da <em>população</em>. É um valor fixo, constante, porém geralmente desconhecido.
+<ul>
+<li><em>Exemplos:</em> A média populacional <span class="math inline">\(\mu\)</span>, a variância populacional <span class="math inline">\(\sigma^2\)</span> e a proporção populacional <span class="math inline">\(p\)</span>.</li>
+</ul></li>
+<li><strong>Estatística (ou Estimador):</strong> É uma medida numérica calculada a partir dos dados da <em>amostra</em>. Como depende de quais elementos foram sorteados, uma estatística é uma <strong>variável aleatória</strong> ela muda a cada nova coleta.
+<ul>
+<li><em>Exemplos:</em> A média amostral <span class="math inline">\(\bar{X}\)</span>, a variância amostral <span class="math inline">\(S^2\)</span> e a proporção amostral <span class="math inline">\(\hat{p}\)</span>.</li>
+</ul></li>
+</ul>
+<p><strong>O Paradigma da estatística:</strong> O nosso objetivo principal a partir de agora é usar uma Estatística (algo que podemos calcular) para “chutar” ou inferir cientificamente o valor de um Parâmetro (algo que queremos descobrir), controlando e quantificando matematicamente a nossa margem de erro.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/flipreis21/PPEC0039/main/estimacao_parametros/data/Gemini_Generated_Image_sy7ehnsy7ehnsy7e.png" class="img-fluid figure-img"></p>
+<figcaption>O Paradigma da Estatística</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="na-prática-parâmetro-vs.-estatística" class="level2">
+<h2 class="anchored" data-anchor-id="na-prática-parâmetro-vs.-estatística">2. Na Prática: Parâmetro vs.&nbsp;Estatística</h2>
+<p>Para consolidar a diferença entre parâmetros e esatísticas, vamos realizar uma simulação computacional. Imagine que somos pesquisadores de saúde estudando a altura de todos os <strong>10.000 habitantes</strong> de uma pequena cidade fictícia.</p>
+<p>Neste experimento controlado, nós sabemos a altura de todo mundo. Portanto, podemos calcular o <strong>Parâmetro</strong> real (a média populacional, <span class="math inline">\(\mu\)</span>).</p>
+<p>No entanto, no mundo real, um pesquisador não teria tempo para medir 10.000 pessoas. Ele selecionaria aleatoriamente uma <strong>Amostra</strong> de, digamos, 50 pessoas e calcularia a <strong>Estatística</strong> (a média amostral, <span class="math inline">\(\bar{X}\)</span>).</p>
+<p>Vamos usar o Python para ver o quão perto a nossa Estatística chega do verdadeiro Parâmetro!</p>
+<div id="cell-4" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:574}}" data-outputid="0e515676-7fc1-4bad-fb8d-b1e08d70ef42" data-execution_count="26">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. CRIANDO A NOSSA POPULAÇÃO (O mundo real e desconhecido)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>) <span class="co">#Essa linha fixa a aleatoriadade da população ao trava com parâmetro 42, para tornar a população aleatória a cada execução, remover...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>populacao <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">170</span>, scale<span class="op">=</span><span class="dv">10</span>, size<span class="op">=</span><span class="dv">10000</span>) <span class="co">#parâmetros fictícios adotados aplicados a uma distribuição normal, podem ser alterados para visualização</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculando o PARÂMETRO (A média real de toda a população)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>parametro_mu <span class="op">=</span> populacao.mean()</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. COLETANDO UMA AMOSTRA (O trabalho do pesquisador)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="va">None</span>) <span class="co"># amostra aleatória, pois parâmetro "none" não trava</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>tamanho_amostra <span class="op">=</span> <span class="dv">50</span> <span class="co"># Mude este número para ver o erro de estimação aumentar ou diminuir</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>amostra <span class="op">=</span> np.random.choice(populacao, size<span class="op">=</span>tamanho_amostra, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculando a ESTATÍSTICA (A média estimada a partir da amostra)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>estatistica_x_barra <span class="op">=</span> amostra.mean()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. VISUALIZANDO OS RESULTADOS</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"--- RESULTADOS DO EXPERIMENTO ---"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Parâmetro (Média da População - 10.000 pessoas): </span><span class="sc">{</span>parametro_mu<span class="sc">:.2f}</span><span class="ss"> cm"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Estatística (Média da Amostra - </span><span class="sc">{</span>tamanho_amostra<span class="sc">}</span><span class="ss"> pessoas): </span><span class="sc">{</span>estatistica_x_barra<span class="sc">:.2f}</span><span class="ss"> cm"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Erro de Estimação (A diferença entre eles): </span><span class="sc">{</span><span class="bu">abs</span>(parametro_mu <span class="op">-</span> estatistica_x_barra)<span class="sc">:.2f}</span><span class="ss"> cm</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando um gráfico para ilustrar</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>plt.hist(populacao, bins<span class="op">=</span><span class="dv">50</span>, color<span class="op">=</span><span class="st">'lightgray'</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">'População Completa'</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>plt.axvline(parametro_mu, color<span class="op">=</span><span class="st">'red'</span>, linestyle<span class="op">=</span><span class="st">'dashed'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">rf'Parâmetro </span><span class="kw">(</span><span class="dv">$\m</span><span class="vs">u</span><span class="dv">$</span><span class="kw">)</span><span class="vs">: </span><span class="sc">{</span>parametro_mu<span class="sc">:.2f}</span><span class="vs">'</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>plt.axvline(estatistica_x_barra, color<span class="op">=</span><span class="st">'blue'</span>, linestyle<span class="op">=</span><span class="st">'solid'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">rf'Estatística </span><span class="kw">(</span><span class="dv">$\b</span><span class="vs">ar</span><span class="ch">{{</span><span class="vs">X</span><span class="ch">}}</span><span class="dv">$</span><span class="kw">)</span><span class="vs">: </span><span class="sc">{</span>estatistica_x_barra<span class="sc">:.2f}</span><span class="vs">'</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribuição de Alturas: População vs. Amostra'</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Altura (cm)'</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Frequência'</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--- RESULTADOS DO EXPERIMENTO ---
+Parâmetro (Média da População - 10.000 pessoas): 169.98 cm
+Estatística (Média da Amostra - 50 pessoas): 169.95 cm
+Erro de Estimação (A diferença entre eles): 0.03 cm
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="estimacao-parametros-correlacao_files/figure-html/cell-2-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="a-mágica-da-inferência-o-teorema-central-do-limite-tcl" class="level2">
+<h2 class="anchored" data-anchor-id="a-mágica-da-inferência-o-teorema-central-do-limite-tcl">3. A Mágica da Inferência: O Teorema Central do Limite (TCL)</h2>
+<p>No passo anterior, vimos que a média de uma amostra (<span class="math inline">\(\bar{X}\)</span>) quase nunca acerta o parâmetro exato (<span class="math inline">\(\mu\)</span>) na mosca. Ela sempre tem um pequeno erro. Mas o que aconteceria se nós repetíssemos esse experimento várias vezes? E se coletássemos centenas de amostras diferentes?</p>
+<p>É aqui que entra o <strong>Teorema Central do Limite (TCL)</strong>, o princípio mais importante da inferência.</p>
+<p>O TCL prova matematicamente que, se coletarmos várias amostras de tamanho suficientemente grande (geralmente <span class="math inline">\(n \ge 30\)</span>), e calcularmos a média de cada uma delas, <strong>a distribuição dessas médias amostrais formará uma curva Normal perfeita</strong>. E o mais incrível: o centro exato dessa nova curva será o verdadeiro parâmetro da população!</p>
+<blockquote class="blockquote">
+<p>📖 <strong>Para aprofundamento:</strong> Se você deseja entender a demonstração matemática formal e a aplicação deste teorema na teoria dos erros e medidas experimentais, recomendamos a leitura do excelente material <a href="https://if.ufrgs.br/~lang/Textos/Teorema_Central_Limite.pdf">Teorema Central do Limite</a>, de autoria do Prof.&nbsp;Fernando Lang da Silveira (IF - UFRGS).</p>
+</blockquote>
+<p>Vamos usar o Python para simular um pesquisador que vai sair às ruas e coletar 1.000 amostras diferentes de 50 pessoas cada. Depois, faremos um gráfico com as 1.000 médias que ele calculou.</p>
+<div id="cell-6" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:488}}" data-outputid="d08a202d-e81e-4305-ae22-d30501a42c43" data-execution_count="27">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns <span class="co"># Biblioteca excelente para gráficos estatísticos</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. RECRIANDO A POPULAÇÃO (Para garantir que rodará mesmo se pularmos células)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>populacao <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">170</span>, scale<span class="op">=</span><span class="dv">10</span>, size<span class="op">=</span><span class="dv">10000</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>parametro_mu <span class="op">=</span> populacao.mean()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. O LOOP DO PESQUISADOR (Coletando 1000 amostras)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>n_amostras <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>tamanho_amostra <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>medias_amostrais <span class="op">=</span> [] <span class="co"># Lista vazia para guardar as 1000 médias</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># O Python vai repetir esse processo 1000 vezes:</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_amostras):</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    amostra <span class="op">=</span> np.random.choice(populacao, size<span class="op">=</span>tamanho_amostra, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    medias_amostrais.append(amostra.mean()) <span class="co"># Guarda a média na lista</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. VISUALIZANDO O TEOREMA CENTRAL DO LIMITE</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotando a distribuição das MÉDIAS (KDE cria a linha suave da curva Normal)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>sns.histplot(medias_amostrais, kde<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">'skyblue'</span>, bins<span class="op">=</span><span class="dv">30</span>, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Desenhando a linha do Parâmetro Real</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>plt.axvline(parametro_mu, color<span class="op">=</span><span class="st">'red'</span>, linestyle<span class="op">=</span><span class="st">'dashed'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">rf'Parâmetro Real </span><span class="kw">(</span><span class="dv">$\m</span><span class="vs">u</span><span class="dv">$</span><span class="kw">)</span><span class="vs">: </span><span class="sc">{</span>parametro_mu<span class="sc">:.2f}</span><span class="vs">'</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculando a média das médias (deve ser quase idêntica ao parâmetro)</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>media_das_medias <span class="op">=</span> np.mean(medias_amostrais)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>plt.axvline(media_das_medias, color<span class="op">=</span><span class="st">'darkblue'</span>, linestyle<span class="op">=</span><span class="st">'dotted'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">rf'Média das Amostras: </span><span class="sc">{</span>media_das_medias<span class="sc">:.2f}</span><span class="vs">'</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Distribuição Amostral das Médias (</span><span class="sc">{</span>n_amostras<span class="sc">}</span><span class="ss"> amostras de tamanho n=</span><span class="sc">{</span>tamanho_amostra<span class="sc">}</span><span class="ss">)'</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Médias Amostrais (cm)'</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Frequência'</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="estimacao-parametros-correlacao_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="teoria-da-estimação-o-que-define-um-bom-estimador" class="level2">
+<h2 class="anchored" data-anchor-id="teoria-da-estimação-o-que-define-um-bom-estimador">4. Teoria da Estimação: O que define um bom Estimador?</h2>
+<p>No Capítulo 11.2 (p.&nbsp;298), Bussab e Morettin introduzem formalmente os conceitos matemáticos que os estatísticos usam para julgar se uma fórmula é adequada para estimar um parâmetro populacional.</p>
+<p>Imagine que queremos estimar um parâmetro genérico da população, que chamaremos de <span class="math inline">\(\theta\)</span> (pode ser a média <span class="math inline">\(\mu\)</span> ou a variância <span class="math inline">\(\sigma^2\)</span>). Para isso, criamos uma fórmula baseada na amostra, que chamamos de <strong>Estimador</strong> (<span class="math inline">\(\hat{\theta}\)</span>). Como a amostra é aleatória, <span class="math inline">\(\hat{\theta}\)</span> também é uma variável aleatória e possui sua própria distribuição.</p>
+<p>Para que um estimador seja considerado ideal, ele deve cumprir propriedades fundamentais:</p>
+<section id="ausência-de-vício-ou-viés-unbiasedness" class="level3">
+<h3 class="anchored" data-anchor-id="ausência-de-vício-ou-viés-unbiasedness">1. Ausência de Vício ou Viés (Unbiasedness)</h3>
+<p>Um estimador é dito <strong>não-viesado</strong> (ou imparcial) se o seu valor esperado (a média de todas as estimativas possíveis) for exatamente igual ao verdadeiro parâmetro populacional. <span class="math display">\[\text{Se } E(\hat{\theta}) = \theta \implies \hat{\theta} \text{ é não-viesado}\]</span></p>
+<p>Se <span class="math inline">\(E(\hat{\theta}) \neq \theta\)</span>, dizemos que o estimador possui um <strong>vício</strong> ou <strong>viés</strong>, quantificado por: <span class="math display">\[\text{Vício}(\hat{\theta}) = E(\hat{\theta}) - \theta\]</span></p>
+</section>
+<section id="eficiência-variância-mínima" class="level3">
+<h3 class="anchored" data-anchor-id="eficiência-variância-mínima">2. Eficiência (Variância Mínima)</h3>
+<p>Se tivermos dois estimadores diferentes (<span class="math inline">\(\hat{\theta}_1\)</span> e <span class="math inline">\(\hat{\theta}_2\)</span>) que não possuem viés, o melhor deles será aquele que tiver a <strong>menor variância</strong>. Isso significa que as estimativas ficam mais agrupadas e próximas do alvo, variando menos de uma amostra para outra. <span class="math display">\[\text{Se } Var(\hat{\theta}_1) &lt; Var(\hat{\theta}_2) \implies \hat{\theta}_1 \text{ é mais eficiente que } \hat{\theta}_2\]</span></p>
+</section>
+<section id="consistência" class="level3">
+<h3 class="anchored" data-anchor-id="consistência">3. Consistência</h3>
+<p>Um estimador é consistente se, à medida que o tamanho da amostra (<span class="math inline">\(n\)</span>) cresce em direção ao infinito, o valor estimado converge para o parâmetro real, e sua variância vai a zero.</p>
+<hr>
+</section>
+<section id="o-clássico-exemplo-teórico-a-variância-amostral-n-vs-n-1" class="level3">
+<h3 class="anchored" data-anchor-id="o-clássico-exemplo-teórico-a-variância-amostral-n-vs-n-1">O Clássico Exemplo Teórico: A Variância Amostral (<span class="math inline">\(n\)</span> vs <span class="math inline">\(n-1\)</span>)</h3>
+<p>Um dos resultados mais intrigantes da teoria da estimação envolve a Variância. Se tentarmos estimar a variância populacional (<span class="math inline">\(\sigma^2\)</span>) usando a intuição matemática direta (dividindo pelo tamanho da amostra <span class="math inline">\(n\)</span>), descobrimos teoricamente que esse estimador é <strong>viesado</strong>: <span class="math display">\[\hat{\sigma}^2_{\text{viesado}} = \frac{1}{n}\sum_{i=1}^{n}(X_i - \bar{X})^2 \implies E(\hat{\sigma}^2_{\text{viesado}}) = \frac{n-1}{n}\sigma^2\]</span></p>
+<p>Observe que ele sistematicamente <strong>subestima</strong> a verdadeira variância da população. Para corrigir esse viés matemático, os estatísticos deduziram que o estimador não-viesado perfeito (denotado por <span class="math inline">\(S^2\)</span>) deve usar <span class="math inline">\(n-1\)</span> no denominador: <span class="math display">\[S^2 = \frac{1}{n-1}\sum_{i=1}^{n}(X_i - \bar{X})^2 \implies E(S^2) = \sigma^2\]</span></p>
+<p>É por isso que nas funções estatísticas e códigos de programação sempre especificamos correções de graus de liberdade (como o argumento <code>ddof=1</code> no Python)!</p>
+<div id="cell-8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="dbe222fe-1df3-4403-9e36-17fa961441ab" data-execution_count="28">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. RECUPERANDO A NOSSA PRIMEIRA AMOSTRA (O cenário do mundo real)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Vamos supor que você foi a campo e coletou a altura de 50 pessoas</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">15</span>) <span class="co"># Semente diferente apenas para simularmos uma coleta específica</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>amostra_real <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">170</span>, scale<span class="op">=</span><span class="dv">10</span>, size<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. CALCULANDO AS ESTATÍSTICAS DA AMOSTRA</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(amostra_real)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>media_amostral <span class="op">=</span> np.mean(amostra_real)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>desvio_padrao_amostral <span class="op">=</span> np.std(amostra_real, ddof<span class="op">=</span><span class="dv">1</span>) <span class="co"># ddof=1 pois é amostra (n-1)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. CONSTRUINDO O INTERVALO DE CONFIANÇA (Capítulo 11.6)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>nivel_confianca <span class="op">=</span> <span class="fl">0.95</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>graus_liberdade <span class="op">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculando o Erro Padrão da Média (Capítulo 11.7)</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>erro_padrao <span class="op">=</span> desvio_padrao_amostral <span class="op">/</span> np.sqrt(n)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Função pronta do Scipy para calcular o intervalo usando t de Student</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>limite_inferior, limite_superior <span class="op">=</span> stats.t.interval(</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    confidence<span class="op">=</span>nivel_confianca,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>graus_liberdade,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    loc<span class="op">=</span>media_amostral,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    scale<span class="op">=</span>erro_padrao</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Margem de erro é a distância da média até um dos limites</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>margem_erro <span class="op">=</span> limite_superior <span class="op">-</span> media_amostral</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. EXIBINDO OS RESULTADOS</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ESTIMAÇÃO DE PARÂMETROS - RESULTADOS"</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Estimação Pontual (Média da Amostra): </span><span class="sc">{</span>media_amostral<span class="sc">:.2f}</span><span class="ss"> cm"</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Margem de Erro Calculada: ± </span><span class="sc">{</span>margem_erro<span class="sc">:.2f}</span><span class="ss"> cm"</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Intervalo de Confiança (95%): [</span><span class="sc">{</span>limite_inferior<span class="sc">:.2f}</span><span class="ss"> cm , </span><span class="sc">{</span>limite_superior<span class="sc">:.2f}</span><span class="ss"> cm]"</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Interpretação: Com base apenas nesta amostra, temos 95% de confiança"</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"de que a verdadeira média de toda a população está dentro deste intervalo."</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+ESTIMAÇÃO DE PARÂMETROS - RESULTADOS
+--------------------------------------------------
+Estimação Pontual (Média da Amostra): 168.70 cm
+Margem de Erro Calculada: ± 2.82 cm
+Intervalo de Confiança (95%): [165.88 cm , 171.52 cm]
+--------------------------------------------------
+Interpretação: Com base apenas nesta amostra, temos 95% de confiança
+de que a verdadeira média de toda a população está dentro deste intervalo.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="determinação-do-tamanho-mínimo-da-amostra" class="level2">
+<h2 class="anchored" data-anchor-id="determinação-do-tamanho-mínimo-da-amostra">5. Determinação do Tamanho Mínimo da Amostra</h2>
+<p>No passo anterior, coletamos uma amostra de <span class="math inline">\(n = 50\)</span> e descobrimos a nossa margem de erro. Mas e se estivéssemos na fase de planejamento do experimento? Como um pesquisador determina, cientificamente, quantas pessoas ou objetos ele precisa medir?</p>
+<p>Conforme discutido por Bussab e Morettin no <strong>Tópico 10.11 (p.&nbsp;287)</strong> e no <strong>Capítulo 11</strong>, a Margem de Erro (<span class="math inline">\(E\)</span>) de uma estimativa depende de três fatores: 1. <strong>O nível de confiança desejado:</strong> que dita o valor crítico (como o escore <span class="math inline">\(Z\)</span>). 2. <strong>A variabilidade dos dados:</strong> representada pelo desvio padrão populacional (<span class="math inline">\(\sigma\)</span>) ou por uma estimativa amostral piloto (<span class="math inline">\(S\)</span>). 3. <strong>O tamanho da amostra (<span class="math inline">\(n\)</span>):</strong> quanto maior a amostra, menor o erro.</p>
+<p>Se fixarmos o erro máximo tolerável (<span class="math inline">\(E\)</span>) e o nível de confiança, podemos isolar matematicamente o tamanho amostral <span class="math inline">\(n\)</span>.</p>
+<section id="tamanho-da-amostra-para-estimar-a-média-mu" class="level3">
+<h3 class="anchored" data-anchor-id="tamanho-da-amostra-para-estimar-a-média-mu">1. Tamanho da Amostra para Estimar a Média (<span class="math inline">\(\mu\)</span>)</h3>
+<p>Utilizando a aproximação pela distribuição Normal Padrão para o planejamento inicial: <span class="math display">\[n = \left( \frac{Z_{\alpha/2} \cdot \sigma}{E} \right)^2\]</span></p>
+</section>
+<section id="tamanho-da-amostra-para-estimar-uma-proporção-p" class="level3">
+<h3 class="anchored" data-anchor-id="tamanho-da-amostra-para-estimar-uma-proporção-p">2. Tamanho da Amostra para Estimar uma Proporção (<span class="math inline">\(p\)</span>)</h3>
+<p>Quando o nosso experimento quer estimar uma taxa ou porcentagem (ex: proporção de cura de um tratamento, intenção de votos): <span class="math display">\[n = \frac{Z_{\alpha/2}^2 \cdot p \cdot (1-p)}{E^2}\]</span></p>
+<p><em>Nota Teórica:</em> Se não conhecemos o valor da proporção populacional <span class="math inline">\(p\)</span> de antemão, adotamos o cenário conservador de <strong>variância máxima</strong>, definindo <span class="math inline">\(p = 0,5\)</span>. Isso garante o maior tamanho de amostra seguro possível.</p>
+<p>Vamos criar uma função em Python para calcular esses tamanhos mínimos automaticamente!</p>
+<div id="cell-10" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="8ba3d888-3d64-4951-b702-eb08f563e5c4" data-execution_count="29">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcular_n_media(erro_maximo, desvio_padrao, confianca<span class="op">=</span><span class="fl">0.95</span>):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Calcula o tamanho mínimo de amostra para estimar uma média.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> confianca</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Encontra o valor crítico Z correspondente à confiança desejada</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    z_critico <span class="op">=</span> <span class="bu">abs</span>(stats.norm.ppf(alpha <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Aplicação da fórmula matemática</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> ((z_critico <span class="op">*</span> desvio_padrao) <span class="op">/</span> erro_maximo) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sempre arredondamos para cima, pois não existe fração de observação/indivíduo</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math.ceil(n)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcular_n_proporcao(erro_maximo, p_esperado<span class="op">=</span><span class="fl">0.5</span>, confianca<span class="op">=</span><span class="fl">0.95</span>):</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Calcula o tamanho mínimo de amostra para estimar uma proporção.</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> confianca</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    z_critico <span class="op">=</span> <span class="bu">abs</span>(stats.norm.ppf(alpha <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Aplicação da fórmula matemática</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> (z_critico<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> p_esperado <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p_esperado)) <span class="op">/</span> (erro_maximo<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math.ceil(n)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># --- APLICANDO OS EXEMPLOS DE PLANEJAMENTO ---</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLANEJAMENTO DE EXPERIMENTOS: CÁLCULO DE TAMANHO DE AMOSTRA"</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Exemplo A: Queremos estimar a média de altura com erro máximo de 2 cm.</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Um estudo piloto anterior indicou que o desvio padrão é de aproximadamente 10 cm.</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>erro_tolerado_media <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>sigma_estimado <span class="op">=</span> <span class="fl">10.0</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>n_necessario_media <span class="op">=</span> calcular_n_media(erro_maximo<span class="op">=</span>erro_tolerado_media, desvio_padrao<span class="op">=</span>sigma_estimado, confianca<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Para estimar a MÉDIA (Erro máx: ±</span><span class="sc">{</span>erro_tolerado_media<span class="sc">}</span><span class="ss">cm | Confiança: 95%):"</span>)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"👉 Tamanho mínimo da amostra necessário: </span><span class="sc">{</span>n_necessario_media<span class="sc">}</span><span class="ss"> observações.</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Exemplo B: Queremos estimar a proporção de eficácia de um novo processo.</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Não temos dados anteriores, então usaremos o cenário de máxima variância (p=0.5).</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Queremos uma margem de erro máxima de 4% (0.04).</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>erro_tolerado_prop <span class="op">=</span> <span class="fl">0.04</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>n_necessario_prop <span class="op">=</span> calcular_n_proporcao(erro_maximo<span class="op">=</span>erro_tolerado_prop, confianca<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Para estimar uma PROPORÇÃO (Erro máx: ±</span><span class="sc">{</span>erro_tolerado_prop<span class="op">*</span><span class="dv">100</span><span class="sc">}</span><span class="ss">% | Confiança: 95%):"</span>)</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"👉 Tamanho mínimo da amostra necessário: </span><span class="sc">{</span>n_necessario_prop<span class="sc">}</span><span class="ss"> observações."</span>)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------------------------
+PLANEJAMENTO DE EXPERIMENTOS: CÁLCULO DE TAMANHO DE AMOSTRA
+------------------------------------------------------------
+Para estimar a MÉDIA (Erro máx: ±2.0cm | Confiança: 95%):
+👉 Tamanho mínimo da amostra necessário: 97 observações.
+
+Para estimar uma PROPORÇÃO (Erro máx: ±4.0% | Confiança: 95%):
+👉 Tamanho mínimo da amostra necessário: 601 observações.
+------------------------------------------------------------</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="aplicação-prática-inspeção-por-amostragem-em-dados-geoespaciais" class="level2">
+<h2 class="anchored" data-anchor-id="aplicação-prática-inspeção-por-amostragem-em-dados-geoespaciais">6. Aplicação Prática: Inspeção por Amostragem em Dados Geoespaciais</h2>
+<p>Para consolidar o que aprendemos sobre o Capítulo 11 de Bussab &amp; Morettin, vamos aplicar as fórmulas de estimação ao contexto de dados geospaciais. Na validação de produtos cartográficos, utilizamos a amostragem para inspecionar lotes de feições geoespaciais e estimar erros posicionais.</p>
+<section id="caso-1-estimação-do-erro-posicional-planimétrico-intervalo-de-confiança" class="level3">
+<h3 class="anchored" data-anchor-id="caso-1-estimação-do-erro-posicional-planimétrico-intervalo-de-confiança">Caso 1: Estimação do Erro Posicional Planimétrico (Intervalo de Confiança)</h3>
+<p>Durante a inspeção de qualidade de uma carta topográfica na escala 1:1.000, um engenheiro cartógrafo coletou uma amostra aleatória de <strong>35 pontos de controle</strong> (Ground Control Points) para medir o erro de deslocamento linear (em metros). Como a variabilidade total do lote é desconhecida, ele utilizará a média amostral, o desvio padrão corrigido (<span class="math inline">\(n-1\)</span>) e a distribuição <strong>t de Student</strong> para estimar, com 95% de confiança, o erro planimétrico médio real do produto para verificar se ele atende aos requisitos do PEC Classe A (cujo erro médio esperado deve estar desalinhado por poucos centímetros/metros).</p>
+</section>
+<section id="caso-2-dimensionamento-amostral-para-feições-omissas-proporção" class="level3">
+<h3 class="anchored" data-anchor-id="caso-2-dimensionamento-amostral-para-feições-omissas-proporção">Caso 2: Dimensionamento Amostral para Feições Omissas (Proporção)</h3>
+<p>Um analista geoespacial precisa inspecionar um grande banco de dados geográficos para estimar a proporção de feições que sofreram “omissão” (erros onde uma feição real em campo foi esquecida no mapa). Ele deseja que a margem de erro máxima da sua estimativa seja de <strong>3% (0.03)</strong> com um nível de confiança de 95%. Como é a primeira inspeção desse lote e ele não tem dados históricos da taxa de erro da empresa de mapeamento, ele adotará o critério de <strong>variância máxima</strong> (<span class="math inline">\(p = 0.5\)</span>) para calcular o tamanho mínimo da amostra (número de feições a checar).</p>
+<p>Vamos programar essas soluções abaixo!</p>
+<div id="cell-12" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="b6c4296c-4be6-4ad3-e9b6-367effa16ddc" data-execution_count="30">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">70</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   CONTROLE DE QUALIDADE DE DADOS GEOESPACIAIS (ET-CQDG) - PRÁTICA   "</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">70</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># CASO 1: INTERVALO DE CONFIANÇA PARA ERRO PLANIMÉTRICO (MÉDIA)</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulando o erro de deslocamento medido em 35 pontos de controle (em metros)</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">101</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>erros_posicionais <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="fl">0.28</span>, scale<span class="op">=</span><span class="fl">0.12</span>, size<span class="op">=</span><span class="dv">35</span>) <span class="co"># média de 28cm de erro</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Estatísticas Amostrais</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>n_pontos <span class="op">=</span> <span class="bu">len</span>(erros_posicionais)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>media_erro <span class="op">=</span> np.mean(erros_posicionais)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># IMPORTANTE: ddof=1 (n-1) para garantir o estimador não-viesado da variância!</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>dp_erro <span class="op">=</span> np.std(erros_posicionais, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros do Intervalo de Confiança (95%)</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>confianca_ic <span class="op">=</span> <span class="fl">0.95</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>graus_liberdade <span class="op">=</span> n_pontos <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>erro_padrao_estimador <span class="op">=</span> dp_erro <span class="op">/</span> np.sqrt(n_pontos)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Construindo o IC com t de Student</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>ic_inf, ic_sup <span class="op">=</span> stats.t.interval(</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    confidence<span class="op">=</span>confianca_ic,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>graus_liberdade,</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    loc<span class="op">=</span>media_erro,</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    scale<span class="op">=</span>erro_padrao_estimador</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"🗺️ INSPEÇÃO 1: Avaliação de Acurácia Posicional Planimétrica"</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Quantidade de pontos de controle inspecionados (n): </span><span class="sc">{</span>n_pontos<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Erro Médio Amostral (Estimativa Pontual): </span><span class="sc">{</span>media_erro<span class="sc">:.3f}</span><span class="ss"> metros"</span>)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Desvio Padrão Corrigido do Erro (S): </span><span class="sc">{</span>dp_erro<span class="sc">:.3f}</span><span class="ss"> metros"</span>)</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Intervalo de Confiança (95%): [</span><span class="sc">{</span>ic_inf<span class="sc">:.3f}</span><span class="ss"> m , </span><span class="sc">{</span>ic_sup<span class="sc">:.3f}</span><span class="ss"> m]"</span>)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"👉 Conclusão Técnica: Estamos 95% confiantes de que o erro planimétrico</span><span class="ch">\n</span><span class="ss">"</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   médio real de TODO o produto cartográfico está entre </span><span class="sc">{</span>ic_inf<span class="sc">:.2f}</span><span class="ss">m e </span><span class="sc">{</span>ic_sup<span class="sc">:.2f}</span><span class="ss">m."</span>)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">70</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>======================================================================
+   CONTROLE DE QUALIDADE DE DADOS GEOESPACIAIS (ET-CQDG) - PRÁTICA   
+======================================================================
+🗺️ INSPEÇÃO 1: Avaliação de Acurácia Posicional Planimétrica
+Quantidade de pontos de controle inspecionados (n): 35
+Erro Médio Amostral (Estimativa Pontual): 0.307 metros
+Desvio Padrão Corrigido do Erro (S): 0.127 metros
+Intervalo de Confiança (95%): [0.263 m , 0.350 m]
+👉 Conclusão Técnica: Estamos 95% confiantes de que o erro planimétrico
+   médio real de TODO o produto cartográfico está entre 0.26m e 0.35m.
+----------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="7f207c6d-d405-459a-bcda-de1cf4d54f8a" data-execution_count="32">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># CASO 2: DIMENSIONAMENTO DE AMOSTRA PARA OMISSÃO DE FEIÇÕES (PROPORÇÃO)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -------------------------------------------------------------------------</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>erro_tolerado_omissao <span class="op">=</span> <span class="fl">0.03</span>  <span class="co"># Margem de erro de 3%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>confianca_planejamento <span class="op">=</span> <span class="fl">0.95</span> <span class="co"># Confiança de 95%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>p_conservador <span class="op">=</span> <span class="fl">0.5</span>           <span class="co"># Máxima variância (inspeção inédita)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Valor crítico Z para 95% de confiança</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> confianca_planejamento</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>z_critico <span class="op">=</span> <span class="bu">abs</span>(stats.norm.ppf(alpha <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Fórmula de dimensionamento amostral para proporção</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>n_minimo_feicoes <span class="op">=</span> (z_critico<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> p_conservador <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p_conservador)) <span class="op">/</span> (erro_tolerado_omissao<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>n_minimo_feicoes <span class="op">=</span> math.ceil(n_minimo_feicoes) <span class="co"># Arredondando para cima</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"📊 INSPEÇÃO 2: Dimensionamento de Amostra para Erros de Omissão"</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Margem de erro máxima estabelecida (E): ± </span><span class="sc">{</span>erro_tolerado_omissao<span class="op">*</span><span class="dv">100</span><span class="sc">}</span><span class="ss">%"</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Nível de Confiança exigido: </span><span class="sc">{</span>confianca_planejamento<span class="op">*</span><span class="dv">100</span><span class="sc">}</span><span class="ss">% (Z = </span><span class="sc">{</span>z_critico<span class="sc">:.3f}</span><span class="ss">)"</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"👉 Tamanho mínimo da amostra (feições a inspecionar): </span><span class="sc">{</span>n_minimo_feicoes<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">70</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>📊 INSPEÇÃO 2: Dimensionamento de Amostra para Erros de Omissão
+Margem de erro máxima estabelecida (E): ± 3.0%
+Nível de Confiança exigido: 95.0% (Z = 1.960)
+👉 Tamanho mínimo da amostra (feições a inspecionar): 1068
+======================================================================</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="análise-de-correlação-e-medidas-de-associação" class="level2">
+<h2 class="anchored" data-anchor-id="análise-de-correlação-e-medidas-de-associação">5. Análise de Correlação e Medidas de Associação</h2>
+<p>A partir de agora, entramos no estudo de relacionamento entre duas ou mais variáveis para entender o quanto uma interfere ou está associada ao resultado da outra.</p>
+<section id="diagramas-de-dispersão" class="level3">
+<h3 class="anchored" data-anchor-id="diagramas-de-dispersão">1. Diagramas de Dispersão</h3>
+<p>O primeiro passo analítico é sempre geométrico: plotar um diagrama de dispersão cartesiano (gráfico X-Y). Ele nos permite examinar visualmente a ocorrência de tendências (lineares ou não), agrupamentos e a presença de valores discrepantes (<em>outliers</em>).</p>
+</section>
+<section id="a-covariância-cxy" class="level3">
+<h3 class="anchored" data-anchor-id="a-covariância-cxy">2. A Covariância <span class="math inline">\(C(X,Y)\)</span></h3>
+<p>Mede a co-variação, ou seja, como as duas variáveis variam de forma conjunta. Se dividirmos o gráfico em quatro quadrantes centrados nas médias (<span class="math inline">\(\bar{X}, \bar{Y}\)</span>): * Se a maioria dos pontos cai nos quadrantes <strong>I e III</strong>, os produtos dos desvios são positivos, gerando uma <strong>covariância positiva</strong> (as variáveis crescem juntas). * Se caem nos quadrantes <strong>II e IV</strong>, os produtos são negativos, indicando uma <strong>covariância negativa</strong> (relação inversa).</p>
+<p>A fórmula da covariância amostral para <span class="math inline">\(n\)</span> pares de dados é: <span class="math display">\[C(X,Y) = \frac{\sum (X_i - \bar{X}) \cdot (Y_i - \bar{Y})}{n}\]</span></p>
+<p><em>Limitação:</em> A covariância é afetada pelas unidades de medida e ordens de grandeza (ex: metros, quilos), o que impede comparar o grau de relação entre experimentos diferentes.</p>
+</section>
+<section id="coeficiente-de-correlação-de-pearson-r" class="level3">
+<h3 class="anchored" data-anchor-id="coeficiente-de-correlação-de-pearson-r">3. Coeficiente de Correlação de Pearson (<span class="math inline">\(r\)</span>)</h3>
+<p>Para remover a influência das unidades, dividimos a covariância pelo produto dos desvios padrões de X e Y. Isso padroniza o indicador, fazendo com que ele varie estritamente entre <strong>-1 e 1</strong>: <span class="math display">\[r = \frac{C(X,Y)}{S_x \cdot S_y}\]</span></p>
+<ul>
+<li><strong><span class="math inline">\(r = 1\)</span>:</strong> Relação linear positiva perfeita.</li>
+<li><strong><span class="math inline">\(r = -1\)</span>:</strong> Relação linear negativa perfeita.</li>
+<li><strong><span class="math inline">\(r = 0\)</span>:</strong> Ausência de relação linear.</li>
+</ul>
+</section>
+<section id="coeficiente-de-determinação-r2" class="level3">
+<h3 class="anchored" data-anchor-id="coeficiente-de-determinação-r2">4. Coeficiente de Determinação (<span class="math inline">\(r^2\)</span>)</h3>
+<p>Definido simplesmente elevando o coeficiente de Pearson ao quadrado (<span class="math inline">\(r^2\)</span>). Sua interpretação é extremamente prática no planejamento de experimentos: ele indica a <strong>proporção da variação de Y que é explicada ou explicável pela variação da variável X</strong> (e vice-versa).</p>
+<p>Vamos replicar o exemplo prático do material (Horas sem Dormir vs.&nbsp;Número de Erros) para calcular e visualizar essas medidas!</p>
+<div id="cell-15" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:772}}" data-outputid="c1f815cf-2cd1-489d-ffe8-0e2692bf1c5c" data-execution_count="33">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. ENTRADA DOS DADOS (Tabela 2 do material de apoio - Horas sem dormir vs Erros)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># X = Horas sem dormir | Y = Número de erros</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">12</span>, <span class="dv">12</span>, <span class="dv">16</span>, <span class="dv">16</span>, <span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">24</span>, <span class="dv">24</span>])</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">8</span>, <span class="dv">14</span>, <span class="dv">14</span>, <span class="dv">12</span>, <span class="dv">16</span>, <span class="dv">12</span>])</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(X)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>media_X <span class="op">=</span> np.mean(X)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>media_Y <span class="op">=</span> np.mean(Y)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. CÁLCULO MANUAL DA COVARIÂNCIA (Conforme Equação 1 do PDF)</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>desvios_X <span class="op">=</span> X <span class="op">-</span> media_X</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>desvios_Y <span class="op">=</span> Y <span class="op">-</span> media_Y</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>produto_desvios <span class="op">=</span> desvios_X <span class="op">*</span> desvios_Y</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Divisão por n conforme a fórmula (1) apresentada no material</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>covariancia <span class="op">=</span> np.<span class="bu">sum</span>(produto_desvios) <span class="op">/</span> n</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. CÁLCULO DOS DESVIOS PADRÕES E PEARSON</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Nota: O material calcula os desvios padrões populacionais no denominador (divido por n)</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>S_X <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(desvios_X<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> n)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>S_Y <span class="op">=</span> np.sqrt(np.<span class="bu">sum</span>(desvios_Y<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> n)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>r_pearson <span class="op">=</span> covariancia <span class="op">/</span> (S_X <span class="op">*</span> S_Y)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>r_quadrado <span class="op">=</span> r_pearson <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. EXIBIÇÃO DOS RESULTADOS ANALÍTICOS</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"        MENSURAÇÃO DE ASSOCIAÇÃO E CORRELAÇÃO LINEAR        "</span>)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Média de Horas sem Dormir (X): </span><span class="sc">{</span>media_X<span class="sc">:.1f}</span><span class="ss"> horas"</span>)</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Média de Erros cometidos (Y): </span><span class="sc">{</span>media_Y<span class="sc">:.1f}</span><span class="ss"> erros"</span>)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Covariância C(X,Y): </span><span class="sc">{</span>covariancia<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente de Correlação de Pearson (r): </span><span class="sc">{</span>r_pearson<span class="sc">:.6f}</span><span class="ss">"</span>)</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente de Determinação (r²): </span><span class="sc">{</span>r_quadrado<span class="sc">:.6f}</span><span class="ss">"</span>)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Interpretação do r²: </span><span class="sc">{</span>r_quadrado<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% da variação nos erros cometidos"</span>)</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"é explicada pelas horas que os indivíduos passaram sem dormir."</span>)</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. CONSTRUÇÃO DO DIAGRAMA DE DISPERSÃO COM QUADRANTES</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>plt.scatter(X, Y, color<span class="op">=</span><span class="st">'blue'</span>, s<span class="op">=</span><span class="dv">80</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, zorder<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'Dados dos Sujeitos'</span>)</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Desenhar as linhas das médias para evidenciar os Quadrantes I, II, III e IV</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>plt.axvline(media_X, color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>plt.axhline(media_Y, color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Linha de tendência linear (Mínimos Quadrados)</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>m, b <span class="op">=</span> np.polyfit(X, Y, <span class="dv">1</span>)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>plt.plot(X, m<span class="op">*</span>X <span class="op">+</span> b, color<span class="op">=</span><span class="st">'red'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Reta de Regressão'</span>)</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Anotações dos Quadrantes conforme a teoria do material</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>plt.text(<span class="dv">21</span>, <span class="fl">14.5</span>, <span class="st">'Quadrante II</span><span class="ch">\n</span><span class="st">(ΔX &gt; 0, ΔY &gt; 0)'</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">'gray'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>plt.text(<span class="dv">9</span>, <span class="fl">14.5</span>, <span class="st">'Quadrante III</span><span class="ch">\n</span><span class="st">(ΔX &lt; 0, ΔY &gt; 0)'</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">'gray'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>plt.text(<span class="dv">9</span>, <span class="fl">6.5</span>, <span class="st">'Quadrante IV</span><span class="ch">\n</span><span class="st">(ΔX &lt; 0, ΔY &lt; 0)'</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">'gray'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>plt.text(<span class="dv">21</span>, <span class="fl">6.5</span>, <span class="st">'Quadrante I</span><span class="ch">\n</span><span class="st">(ΔX &gt; 0, ΔY &lt; 0)'</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">'gray'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Diagrama de Dispersão: Efeito da Escassez de Sono'</span>)</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Horas sem Dormir (X)'</span>)</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Número de Erros (Y)'</span>)</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">6</span>, <span class="dv">26</span>)</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">4</span>, <span class="dv">18</span>)</span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">':'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>============================================================
+        MENSURAÇÃO DE ASSOCIAÇÃO E CORRELAÇÃO LINEAR        
+============================================================
+Média de Horas sem Dormir (X): 16.0 horas
+Média de Erros cometidos (Y): 10.6 erros
+Covariância C(X,Y): 15.20
+Coeficiente de Correlação de Pearson (r): 0.801467
+Coeficiente de Determinação (r²): 0.642349
+------------------------------------------------------------
+Interpretação do r²: 64.23% da variação nos erros cometidos
+é explicada pelas horas que os indivíduos passaram sem dormir.
+============================================================</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="estimacao-parametros-correlacao_files/figure-html/cell-8-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusão-da-aula" class="level2">
+<h2 class="anchored" data-anchor-id="conclusão-da-aula">6. Conclusão da Aula</h2>
+<p>Ao longo deste Jupyter Notebook, nós integramos os fundamentos teóricos da modelagem estatística com a execução computacional em Python, cobrindo duas grandes áreas da inferência:</p>
+<ol type="1">
+<li><strong>A Teoria da Estimação e Amostragem:</strong> Onde entendemos o comportamento das variáveis aleatórias por meio das distribuições amostrais, calculamos intervalos de confiança robustos utilizando a correção para estimadores não-viesados (<span class="math inline">\(n-1\)</span>) e aprendemos a dimensionar o tamanho mínimo de uma amostra para o planejamento eficiente de experimentos.</li>
+<li><strong>A Análise de Associação:</strong> Onde deixamos de olhar para variáveis isoladas para estudar a variação conjunta (covariância), o grau de relacionamento linear entre dois fenômenos (Pearson) e a proporção de impacto que uma variável exerce sobre a outra (<span class="math inline">\(r^2\)</span>), sem a necessidade de adentrar em testes de hipóteses formais.</li>
+</ol>
+<p>Este ecossistema foi elaborado com conhecimentos adquiridos nas aulas do componente PPEC0039 - Esatística e experimentos e leitura das referências bibliográficas abaixo, formatado com auxílio de IA - Generativa, mais especificamente o GEMINI Pro 3.1, utilizado para formatação do markdown, correção de semântica e escrita e ajuda no uso de bibliotecas e funções python para resolução dos exemplos.</p>
+<hr>
+</section>
+<section id="fontes-e-referências-bibliográficas" class="level2">
+<h2 class="anchored" data-anchor-id="fontes-e-referências-bibliográficas">📚 Fontes e Referências Bibliográficas</h2>
+<p>Este material de ensino foi construído, adaptado e fundamentado com base nas seguintes fontes de referência:</p>
+<ul>
+<li><strong>Livro Base (Capítulos 10 e 11):</strong> BUSSAB, Wilton de O.; MORETTIN, Pedro A. <em>Estatística Básica</em>. 9. ed.&nbsp;São Paulo: Saraiva Uni, 2017. (Foco em Introdução à Inferência Estatística e Teoria da Estimação).Disponível em: <a href="https://www.professores.uff.br/jutriavaldes/wp-content/uploads/sites/196/2019/08/Book_EstatBas-Morettin-Bussab.pdf" class="uri">https://www.professores.uff.br/jutriavaldes/wp-content/uploads/sites/196/2019/08/Book_EstatBas-Morettin-Bussab.pdf</a></li>
+<li><strong>Material de Apoio e Teoria dos Erros:</strong> SILVEIRA, Fernando Lang da. <em>Teorema Central do Limite</em>. Instituto de Física, Universidade Federal do Rio Grande do Sul (UFRGS). Disponível em: <a href="https://if.ufrgs.br/~lang/Textos/Teorema_Central_Limite.pdf" class="uri">https://if.ufrgs.br/~lang/Textos/Teorema_Central_Limite.pdf</a>.</li>
+<li><strong>Material Didático de Associação apresentado pelo prof. Mauro:</strong> GUIMARÃES, Paulo Ricardo B. <em>Análise de Correlação e Medidas de Associação</em>. Texto de apoio acadêmico (Foco em diagramas de dispersão, cálculo analítico de covariância e interpretação geométrica dos quadrantes de desvios).</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Felipe Reis da Cruz · Página acadêmica desenvolvida com Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

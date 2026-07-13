@@ -1,1 +1,0 @@
-# Respositório sobre regressão linear

@@ -1,0 +1,16 @@
+[
+  {
+    "listing": "/lista_disciplina.html",
+    "items": [
+      "/notebooks/amostragem.html",
+      "/notebooks/analise-variancia-anova.html",
+      "/notebooks/distribuicoes-probabilidade.html",
+      "/notebooks/estimacao-parametros-correlacao.html",
+      "/notebooks/planejamento-experimentos.html",
+      "/notebooks/principios-basicos-experimentacao.html",
+      "/notebooks/regressao-linear.html",
+      "/notebooks/teste-hipotese.html",
+      "/notebooks/normalidade-homocedasticidade.html"
+    ]
+  }
+]

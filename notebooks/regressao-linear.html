@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Felipe Reis da Cruz">
+<meta name="description" content="Estudo da regressão linear simples, estimação por mínimos quadrados, ANOVA e avaliação do ajuste.">
+
+<title>Regressão Linear: Teoria e Prática Computacional – Felipe Reis da Cruz</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fba3472d0f8a2e145e84a3325e8b457d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-md " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Felipe Reis da Cruz</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Procurar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Alternar de navegação" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Início</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lista_disciplina.html"> 
+<span class="menu-text">Aulas</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">Sobre</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Nesta página</h2>
+   
+  <ul>
+  <li><a href="#regressão-linear-teoria-e-prática-computacional" id="toc-regressão-linear-teoria-e-prática-computacional" class="nav-link active" data-scroll-target="#regressão-linear-teoria-e-prática-computacional">Regressão Linear: Teoria e Prática Computacional</a>
+  <ul class="collapse">
+  <li><a href="#introdução-e-contextualização-do-modelo" id="toc-introdução-e-contextualização-do-modelo" class="nav-link" data-scroll-target="#introdução-e-contextualização-do-modelo">1. Introdução e Contextualização do Modelo</a>
+  <ul class="collapse">
+  <li><a href="#o-paradigma-teórico-esperança-condicional" id="toc-o-paradigma-teórico-esperança-condicional" class="nav-link" data-scroll-target="#o-paradigma-teórico-esperança-condicional">O Paradigma Teórico: Esperança Condicional</a></li>
+  <li><a href="#o-modelo-estatístico-com-termo-de-erro" id="toc-o-modelo-estatístico-com-termo-de-erro" class="nav-link" data-scroll-target="#o-modelo-estatístico-com-termo-de-erro">O Modelo Estatístico com Termo de Erro</a></li>
+  </ul></li>
+  <li><a href="#estimação-dos-parâmetros-via-mínimos-quadrados-mq" id="toc-estimação-dos-parâmetros-via-mínimos-quadrados-mq" class="nav-link" data-scroll-target="#estimação-dos-parâmetros-via-mínimos-quadrados-mq">2. Estimação dos Parâmetros via Mínimos Quadrados (MQ)</a>
+  <ul class="collapse">
+  <li><a href="#as-equações-normais-e-soluções-analíticas" id="toc-as-equações-normais-e-soluções-analíticas" class="nav-link" data-scroll-target="#as-equações-normais-e-soluções-analíticas">As Equações Normais e Soluções Analíticas</a></li>
+  </ul></li>
+  <li><a href="#aplicação-prática-o-exemplo-de-idade-vs.-tempo-de-reação" id="toc-aplicação-prática-o-exemplo-de-idade-vs.-tempo-de-reação" class="nav-link" data-scroll-target="#aplicação-prática-o-exemplo-de-idade-vs.-tempo-de-reação">3. Aplicação Prática: O Exemplo de Idade vs.&nbsp;Tempo de Reação</a>
+  <ul class="collapse">
+  <li><a href="#nosso-objetivo-no-python" id="toc-nosso-objetivo-no-python" class="nav-link" data-scroll-target="#nosso-objetivo-no-python">Nosso Objetivo no Python:</a></li>
+  </ul></li>
+  <li><a href="#interpretação-prática-do-modelo-ajustado" id="toc-interpretação-prática-do-modelo-ajustado" class="nav-link" data-scroll-target="#interpretação-prática-do-modelo-ajustado">4. Interpretação Prática do Modelo Ajustado</a>
+  <ul class="collapse">
+  <li><a href="#o-poder-da-interpolação-linear" id="toc-o-poder-da-interpolação-linear" class="nav-link" data-scroll-target="#o-poder-da-interpolação-linear">O Poder da Interpolação Linear</a></li>
+  </ul></li>
+  <li><a href="#avaliação-do-modelo-descomposição-da-variância-anova" id="toc-avaliação-do-modelo-descomposição-da-variância-anova" class="nav-link" data-scroll-target="#avaliação-do-modelo-descomposição-da-variância-anova">5. Avaliação do Modelo: Descomposição da Variância (ANOVA)</a>
+  <ul class="collapse">
+  <li><a href="#o-coeficiente-de-determinação-r2" id="toc-o-coeficiente-de-determinação-r2" class="nav-link" data-scroll-target="#o-coeficiente-de-determinação-r2">O Coeficiente de Determinação (<span class="math inline">\(R^2\)</span>)</a></li>
+  <li><a href="#estimando-a-variância-residual-sigma_e2" id="toc-estimando-a-variância-residual-sigma_e2" class="nav-link" data-scroll-target="#estimando-a-variância-residual-sigma_e2">Estimando a Variância Residual (<span class="math inline">\(\sigma_e^2\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#análise-teórica-da-anova-obtida" id="toc-análise-teórica-da-anova-obtida" class="nav-link" data-scroll-target="#análise-teórica-da-anova-obtida">6. Análise Teórica da ANOVA Obtida</a></li>
+  <li><a href="#o-modelo-probabilístico-e-propriedades-amostrais" id="toc-o-modelo-probabilístico-e-propriedades-amostrais" class="nav-link" data-scroll-target="#o-modelo-probabilístico-e-propriedades-amostrais">7. O Modelo Probabilístico e Propriedades Amostrais</a></li>
+  </ul></li>
+  <li><a href="#esperança-nula-ee_i-0-para-todo-i.-em-média-os-erros-se-anulam." id="toc-esperança-nula-ee_i-0-para-todo-i.-em-média-os-erros-se-anulam." class="nav-link" data-scroll-target="#esperança-nula-ee_i-0-para-todo-i.-em-média-os-erros-se-anulam.">1. Esperança Nula: <span class="math inline">\(E(e_i) = 0\)</span> para todo <span class="math inline">\(i\)</span>. Em média, os erros se anulam.</a>
+  <ul class="collapse">
+  <li><a href="#o-erro-padrão-e-a-distribuição-t-de-student" id="toc-o-erro-padrão-e-a-distribuição-t-de-student" class="nav-link" data-scroll-target="#o-erro-padrão-e-a-distribuição-t-de-student">O Erro Padrão e a Distribuição <span class="math inline">\(t\)</span> de Student</a></li>
+  <li><a href="#aplicação-prática-engenharia-geoespacial-e-sistemas-de-endereçamento" id="toc-aplicação-prática-engenharia-geoespacial-e-sistemas-de-endereçamento" class="nav-link" data-scroll-target="#aplicação-prática-engenharia-geoespacial-e-sistemas-de-endereçamento">8. Aplicação Prática: Engenharia Geoespacial e Sistemas de Endereçamento</a>
+  <ul class="collapse">
+  <li><a href="#o-problema-científico" id="toc-o-problema-científico" class="nav-link" data-scroll-target="#o-problema-científico">O Problema Científico</a></li>
+  <li><a href="#a-solução-proposta-geocódigo-por-grade" id="toc-a-solução-proposta-geocódigo-por-grade" class="nav-link" data-scroll-target="#a-solução-proposta-geocódigo-por-grade">A Solução Proposta: Geocódigo por Grade</a></li>
+  <li><a href="#exemplo-prático-1-complexidade-da-malha-urbana-vs.-erro-posicional-das-plataformas-tradicionais" id="toc-exemplo-prático-1-complexidade-da-malha-urbana-vs.-erro-posicional-das-plataformas-tradicionais" class="nav-link" data-scroll-target="#exemplo-prático-1-complexidade-da-malha-urbana-vs.-erro-posicional-das-plataformas-tradicionais">Exemplo Prático 1: Complexidade da Malha Urbana vs.&nbsp;Erro Posicional das Plataformas Tradicionais</a></li>
+  <li><a href="#exemplo-prático-2-curva-de-aprendizado-e-expertise-do-usuário-na-aquisição-do-geocódigo" id="toc-exemplo-prático-2-curva-de-aprendizado-e-expertise-do-usuário-na-aquisição-do-geocódigo" class="nav-link" data-scroll-target="#exemplo-prático-2-curva-de-aprendizado-e-expertise-do-usuário-na-aquisição-do-geocódigo">Exemplo Prático 2: Curva de Aprendizado e Expertise do Usuário na Aquisição do Geocódigo</a></li>
+  <li><a href="#exemplo-prático-3-impacto-ao-usuário-final-resolução-espacial-vs.-tempo-de-busca-operacional" id="toc-exemplo-prático-3-impacto-ao-usuário-final-resolução-espacial-vs.-tempo-de-busca-operacional" class="nav-link" data-scroll-target="#exemplo-prático-3-impacto-ao-usuário-final-resolução-espacial-vs.-tempo-de-busca-operacional">Exemplo Prático 3: Impacto ao Usuário Final — Resolução Espacial vs.&nbsp;Tempo de Busca Operacional</a></li>
+  </ul></li>
+  <li><a href="#conclusão-do-módulo-de-regressão-e-recomendações-futuras" id="toc-conclusão-do-módulo-de-regressão-e-recomendações-futuras" class="nav-link" data-scroll-target="#conclusão-do-módulo-de-regressão-e-recomendações-futuras">9. Conclusão do Módulo de Regressão e Recomendações Futuras</a>
+  <ul class="collapse">
+  <li><a href="#recomendações-para-a-continuidade-dos-exemplos-apresentados" id="toc-recomendações-para-a-continuidade-dos-exemplos-apresentados" class="nav-link" data-scroll-target="#recomendações-para-a-continuidade-dos-exemplos-apresentados">Recomendações para a Continuidade dos exemplos apresentados:</a></li>
+  </ul></li>
+  <li><a href="#fontes-e-referências-bibliográficas" id="toc-fontes-e-referências-bibliográficas" class="nav-link" data-scroll-target="#fontes-e-referências-bibliográficas">📚 Fontes e Referências Bibliográficas</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Regressão Linear: Teoria e Prática Computacional</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">PPEC0039</div>
+    <div class="quarto-category">Estatística</div>
+    <div class="quarto-category">Regressão Linear</div>
+    <div class="quarto-category">Produção própria</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Estudo da regressão linear simples, estimação por mínimos quadrados, ANOVA e avaliação do ajuste.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-contents">
+             <p>Felipe Reis da Cruz </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Data de Publicação</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">1 de junho de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/flipreis21/PPEC0039/blob/main/regressao_Linear.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a></p>
+<section id="regressão-linear-teoria-e-prática-computacional" class="level1">
+<h1>Regressão Linear: Teoria e Prática Computacional</h1>
+<p>Referência Principal: Morettin, P. A. &amp; Bussab, W. O. <em>Estatística Básica</em>. Capítulo 16.</p>
+<hr>
+<section id="introdução-e-contextualização-do-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="introdução-e-contextualização-do-modelo">1. Introdução e Contextualização do Modelo</h2>
+<p>Nosso objetivo é modelar e prever o comportamento de uma variável quantitativa de interesse (chamada de variável resposta ou dependente, <span class="math inline">\(Y\)</span>) em função de outra variável (chamada de variável explicativa, preditora, de controle, ou indepependete <span class="math inline">\(X\)</span>).</p>
+<section id="o-paradigma-teórico-esperança-condicional" class="level3">
+<h3 class="anchored" data-anchor-id="o-paradigma-teórico-esperança-condicional">O Paradigma Teórico: Esperança Condicional</h3>
+<p>De forma puramente teórica, se considerarmos duas variáveis aleatórias quantitativas definidas sobre uma mesma população, a relação geométrica ideal entre elas é dada pela esperança condicional de <span class="math inline">\(Y\)</span> dado <span class="math inline">\(X=x\)</span>, denotada por <span class="math inline">\(E(Y|x) = \mu(x)\)</span>.</p>
+<p>Embora <span class="math inline">\(\mu(x)\)</span> possa assumir qualquer formato matemático, o caso mais simples e de grande interesse prático ocorre quando assumimos que o comportamento médio de <span class="math inline">\(Y\)</span> varia de forma estritamente linear em relação a <span class="math inline">\(X\)</span>. Propomos, portanto, o modelo:</p>
+<p><span class="math display">\[E(Y|x) = \mu(x) = \alpha + \beta x\]</span></p>
+</section>
+<section id="o-modelo-estatístico-com-termo-de-erro" class="level3">
+<h3 class="anchored" data-anchor-id="o-modelo-estatístico-com-termo-de-erro">O Modelo Estatístico com Termo de Erro</h3>
+<p>No mundo real, os dados observados nunca ficarão perfeitamente alinhados sobre uma reta ideal devido a ruídos, variações individuais e fatores não medidos. Assim, para uma amostra de <span class="math inline">\(n\)</span> indivíduos, formulamos o Modelo de Regressão Linear Simples:</p>
+<p><span class="math display">\[y_i = \alpha + \beta x_i + e_i, \quad i = 1, 2, \dots, n\]</span></p>
+<p>Onde: * <span class="math inline">\(y_i\)</span>: Valor observado da variável resposta para o <span class="math inline">\(i\)</span>-ésimo indivíduo. * <span class="math inline">\(x_i\)</span>: Valor da variável explicativa, tratada aqui como uma variável fixa (determinística), controlada pelo pesquisador e sem erro de medição. * <span class="math inline">\(\alpha\)</span> (Intercepto): O ponto onde a reta corta o eixo das ordenadas (<span class="math inline">\(Y\)</span>). Representa o valor médio de <span class="math inline">\(Y\)</span> quando <span class="math inline">\(X = 0\)</span>. * <span class="math inline">\(\beta\)</span> (Coeficiente Angular / Inclinação): Representa o quanto varia a média de <span class="math inline">\(Y\)</span> para o aumento de uma unidade da variável <span class="math inline">\(X\)</span>. * <span class="math inline">\(e_i\)</span> (Erro Aleatório ou Desvio): A discrepância individual entre o valor real observado <span class="math inline">\(y_i\)</span> e a média teórica esperada <span class="math inline">\(\alpha + \beta x_i\)</span>.</p>
+</section>
+</section>
+<section id="estimação-dos-parâmetros-via-mínimos-quadrados-mq" class="level2">
+<h2 class="anchored" data-anchor-id="estimação-dos-parâmetros-via-mínimos-quadrados-mq">2. Estimação dos Parâmetros via Mínimos Quadrados (MQ)</h2>
+<p>Como os parâmetros populacionais <span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> são desconhecidos, precisamos estimá-los a partir de uma amostra de <span class="math inline">\(n\)</span> pares de observações <span class="math inline">\((x_i, y_i)\)</span>. Para isso, adota-se o critério de Mínimos Quadrados, que consiste em encontrar estimadores (<span class="math inline">\(\hat{\alpha}\)</span> e <span class="math inline">\(\hat{\beta}\)</span>) que minimizem a Soma dos Quadrados dos Erros (SQRes).</p>
+<p>Isolando o erro da equação do modelo, temos: <span class="math display">\[e_i = y_i - (\alpha + \beta x_i)\]</span></p>
+<p>A função objetivo que desejamos minimizar é: <span class="math display">\[SQ(\alpha, \beta) = \sum_{i=1}^{n} e_i^2 = \sum_{i=1}^{n} \{y_i - (\alpha + \beta x_i)\}^2\]</span></p>
+<section id="as-equações-normais-e-soluções-analíticas" class="level3">
+<h3 class="anchored" data-anchor-id="as-equações-normais-e-soluções-analíticas">As Equações Normais e Soluções Analíticas</h3>
+<p>Derivando a função <span class="math inline">\(SQ(\alpha, \beta)\)</span> em relação a <span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> e igualando os resultados a zero, obtemos o sistema de equações normais. A resolução analítica desse sistema nos fornece as fórmulas dos estimadores de mínimos quadrados:</p>
+<p><span class="math display">\[\hat{\beta} = \frac{\sum_{i=1}^{n} x_i y_i - n\bar{x}\bar{y}}{\sum_{i=1}^{n} x_i^2 - n\bar{x}^2} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}\]</span></p>
+<p><span class="math display">\[\hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}\]</span></p>
+<p>Onde <span class="math inline">\(\bar{x}\)</span> e <span class="math inline">\(\bar{y}\)</span> são as médias amostrais de <span class="math inline">\(X\)</span> e <span class="math inline">\(Y\)</span>, respectivamente. Uma vez obtidos <span class="math inline">\(\hat{\alpha}\)</span> e <span class="math inline">\(\hat{\beta}\)</span>, o valor predito (ajustado) para qualquer observação é dado por:</p>
+<p><span class="math display">\[\hat{y}_i = \hat{\alpha} + \hat{\beta}x_i\]</span></p>
+</section>
+</section>
+<section id="aplicação-prática-o-exemplo-de-idade-vs.-tempo-de-reação" class="level2">
+<h2 class="anchored" data-anchor-id="aplicação-prática-o-exemplo-de-idade-vs.-tempo-de-reação">3. Aplicação Prática: O Exemplo de Idade vs.&nbsp;Tempo de Reação</h2>
+<p>Para dar vida às equações que deduzimos, utilizaremos o exemplo clássico apresentado no Capítulo 15 e recapitulado no Capítulo 16. O estudo avaliou o tempo de reação ao estímulo (<span class="math inline">\(Y\)</span>, em milissegundos) de <span class="math inline">\(n = 20\)</span> indivíduos distribuídos em cinco faixas etárias fixas (<span class="math inline">\(X = 20, 25, 30, 35, 40\)</span> anos), com 4 repetições por grupo.</p>
+<section id="nosso-objetivo-no-python" class="level3">
+<h3 class="anchored" data-anchor-id="nosso-objetivo-no-python">Nosso Objetivo no Python:</h3>
+<ol type="1">
+<li>Criar um conjunto de dados aleatório</li>
+<li>Implementar as fórmulas analíticas manuais de Mínimos Quadrados para encontrar <span class="math inline">\(\hat{\beta}\)</span> e <span class="math inline">\(\hat{\alpha}\)</span>, sem depender de pacotes prontos de modelagem neste primeiro momento.</li>
+<li>Traçar a reta de regressão teórica sobre os pontos observados.</li>
+</ol>
+<div id="cell-5" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:662}}" data-outputid="54274f25-881c-418e-b47a-f28dbb61db3d" data-execution_count="16">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. CRIANDO OS DADOS DA TABELA 16.1 (Morettin &amp; Bussab)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 5 subgrupos de idade (X) com 4 indivíduos em cada grupo (total n = 20)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">20</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>              <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">25</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>              <span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">30</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>              <span class="dv">35</span>, <span class="dv">35</span>, <span class="dv">35</span>, <span class="dv">35</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>              <span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Tempos de reação observados correspondentes (Y)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array([<span class="dv">96</span>, <span class="dv">92</span>, <span class="dv">106</span>, <span class="dv">100</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>              <span class="dv">98</span>, <span class="dv">104</span>, <span class="dv">110</span>, <span class="dv">101</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>              <span class="dv">116</span>, <span class="dv">106</span>, <span class="dv">109</span>, <span class="dv">100</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>              <span class="dv">112</span>, <span class="dv">105</span>, <span class="dv">118</span>, <span class="dv">108</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>              <span class="dv">113</span>, <span class="dv">112</span>, <span class="dv">127</span>, <span class="dv">117</span>])</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(x)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. CALCULANDO AS ESTATÍSTICAS SUMÁRIAS</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>soma_x <span class="op">=</span> np.<span class="bu">sum</span>(x)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>soma_y <span class="op">=</span> np.<span class="bu">sum</span>(y)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>soma_x2 <span class="op">=</span> np.<span class="bu">sum</span>(x<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>soma_xy <span class="op">=</span> np.<span class="bu">sum</span>(x <span class="op">*</span> y)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>media_x <span class="op">=</span> np.mean(x)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>media_y <span class="op">=</span> np.mean(y)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. APLICANDO AS FÓRMULAS DE MÍNIMOS QUADRADOS</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Coeficiente Angular (Beta chapéu)</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>numerador_beta <span class="op">=</span> soma_xy <span class="op">-</span> n <span class="op">*</span> media_x <span class="op">*</span> media_y</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>denominador_beta <span class="op">=</span> soma_x2 <span class="op">-</span> n <span class="op">*</span> (media_x<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>beta_chapeu <span class="op">=</span> numerador_beta <span class="op">/</span> denominador_beta</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Intercepto (Alpha chapéu)</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>alpha_chapeu <span class="op">=</span> media_y <span class="op">-</span> beta_chapeu <span class="op">*</span> media_x</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   ESTIMADORES DE MÍNIMOS QUADRADOS (ANALÍTICO)"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Soma de X: </span><span class="sc">{</span>soma_x<span class="sc">}</span><span class="ss"> | Soma de Y: </span><span class="sc">{</span>soma_y<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Média de X (x_barra): </span><span class="sc">{</span>media_x<span class="sc">:.2f}</span><span class="ss"> | Média de Y (y_barra): </span><span class="sc">{</span>media_y<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente Angular (β^): </span><span class="sc">{</span>beta_chapeu<span class="sc">:.4f}</span><span class="ss"> (Oficial do livro: 0.90)"</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Intercepto (α^): </span><span class="sc">{</span>alpha_chapeu<span class="sc">:.4f}</span><span class="ss"> (Oficial do livro: 80.50)"</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Equação Ajustada: Ŷ_i = </span><span class="sc">{</span>alpha_chapeu<span class="sc">:.2f}</span><span class="ss"> + </span><span class="sc">{</span>beta_chapeu<span class="sc">:.2f}</span><span class="ss"> * X_i</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. GERANDO O GRÁFICO DE DISPERSÃO COM A RETA AJUSTADA (Figura 16.1)</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">5</span>))</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>plt.scatter(x, y, color<span class="op">=</span><span class="st">'darkblue'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, zorder<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'Dados Observados (n=20)'</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando pontos sobre a reta para o traçado gráfico</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>x_reta <span class="op">=</span> np.linspace(<span class="dv">18</span>, <span class="dv">42</span>, <span class="dv">100</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>y_predito <span class="op">=</span> alpha_chapeu <span class="op">+</span> beta_chapeu <span class="op">*</span> x_reta</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>plt.plot(x_reta, y_predito, color<span class="op">=</span><span class="st">'crimson'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">rf'Reta de MQ: </span><span class="dv">$</span><span class="er">\</span><span class="vs">hat</span><span class="ch">{{</span><span class="vs">y</span><span class="ch">}}</span><span class="vs"> = </span><span class="sc">{</span>alpha_chapeu<span class="sc">:.2f}</span><span class="vs"> </span><span class="op">+</span><span class="vs"> </span><span class="sc">{</span>beta_chapeu<span class="sc">:.2f}</span><span class="vs">x</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gráfico de Dispersão de Idade e Reação ao Estímulo (Morettin &amp; Bussab)'</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Idade (x)'</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Tempo de Estímulo (y)'</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">18</span>, <span class="dv">42</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">85</span>, <span class="dv">132</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+   ESTIMADORES DE MÍNIMOS QUADRADOS (ANALÍTICO)
+--------------------------------------------------
+Soma de X: 600 | Soma de Y: 2150
+Média de X (x_barra): 30.00 | Média de Y (y_barra): 107.50
+Coeficiente Angular (β^): 0.9000 (Oficial do livro: 0.90)
+Intercepto (α^): 80.5000 (Oficial do livro: 80.50)
+--------------------------------------------------
+Equação Ajustada: Ŷ_i = 80.50 + 0.90 * X_i
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regressao-linear_files/figure-html/cell-2-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="interpretação-prática-do-modelo-ajustado" class="level2">
+<h2 class="anchored" data-anchor-id="interpretação-prática-do-modelo-ajustado">4. Interpretação Prática do Modelo Ajustado</h2>
+<p>Com base no <em>output</em> computacional, nossa reta estimada é dada por:</p>
+<p><span class="math display">\[\hat{y}_i = 80,50 + 0,90x_i\]</span></p>
+<p>Seguindo o rigor da análise de dados exposta pelos autores, interpretamos os coeficientes da seguinte maneira:</p>
+<ul>
+<li><span class="math inline">\(\hat{\beta} = 0,90\)</span> (Coeficiente Angular): Representa o acréscimo estimado no tempo médio de reação para cada ano de envelhecimento das pessoas. Ou seja, a cada ano que uma pessoa envelhece, seu tempo de reação ao estímulo aumenta, em média, em 0,90 milissegundos.</li>
+<li><span class="math inline">\(\hat{\alpha} = 80,50\)</span> (Intercepto): Representa o tempo médio de reação teórico para um indivíduo com idade zero (recém-nascido). Aqui, Morettin e Bussab fazem uma ressalva metodológica fundamental: trata-se de uma inadequação física do modelo, pois a amostra não possui dados próximos de zero. O intercepto funciona, neste caso, primordialmente como uma constante de ajuste matemático para posicionar a reta no plano cartesiano.</li>
+</ul>
+<section id="o-poder-da-interpolação-linear" class="level3">
+<h3 class="anchored" data-anchor-id="o-poder-da-interpolação-linear">O Poder da Interpolação Linear</h3>
+<p>Uma das grandes vantagens de modelar essa relação por meio de uma reta funcional, em comparação com a análise simples de médias por grupos (feita no Capítulo 15), é a capacidade de prever valores para grupos de idades que sequer foram coletados no experimento original.</p>
+<p>Por exemplo, se o pesquisador quisesse estimar o tempo de reação médio para um grupo de pessoas com 33 anos, bastaria interpolar o valor na equação: <span class="math display">\[\hat{y}(33) = 80,50 + 0,90 \cdot (33) = 110,20\text{ ms}\]</span></p>
+</section>
+</section>
+<section id="avaliação-do-modelo-descomposição-da-variância-anova" class="level2">
+<h2 class="anchored" data-anchor-id="avaliação-do-modelo-descomposição-da-variância-anova">5. Avaliação do Modelo: Descomposição da Variância (ANOVA)</h2>
+<p>Para sabermos se a reta de regressão calculada é realmente útil para prever o tempo de reação, precisamos avaliar a qualidade do ajuste. A estratégia estatística consiste em decompor a variabilidade total da variável resposta <span class="math inline">\(Y\)</span> em duas componentes:</p>
+<ol type="1">
+<li>Soma dos Quadrados Totais (SQTot): A variabilidade total dos dados originais de <span class="math inline">\(Y\)</span> em relação à sua própria média (<span class="math inline">\(\bar{y}\)</span>).</li>
+<li>Soma dos Quadrados da Regressão (SQReg): A variabilidade que a nossa reta de regressão consegue capturar e explicar.</li>
+<li>Soma dos Quadrados dos Resíduos (SQRes): A variabilidade dos erros, ou seja, o que a reta não consegue explicar (distância dos pontos reais até a reta).</li>
+</ol>
+<p>A identidade fundamental da regressão garante que: <span class="math display">\[SQTot = SQReg + SQRes\]</span></p>
+<p>Matematicamente, as fórmulas descritas no livro são: * <span class="math display">\[SQTot = \sum_{i=1}^{n} (y_i - \bar{y})^2 = \sum_{i=1}^{n} y_i^2 - n\bar{y}^2\]</span> * <span class="math display">\[SQReg = \sum_{i=1}^{n} (\hat{y}_i - \bar{y})^2 = \hat{\beta}^2 \sum_{i=1}^{n} (x_i - \bar{x})^2\]</span> * <span class="math display">\[SQRes = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = SQTot - SQReg\]</span></p>
+<section id="o-coeficiente-de-determinação-r2" class="level3">
+<h3 class="anchored" data-anchor-id="o-coeficiente-de-determinação-r2">O Coeficiente de Determinação (<span class="math inline">\(R^2\)</span>)</h3>
+<p>O <span class="math inline">\(R^2\)</span> representa a proporção da variabilidade total de <span class="math inline">\(Y\)</span> que é explicada pela variável <span class="math inline">\(X\)</span> através da reta de regressão:</p>
+<p><span class="math display">\[R^2 = \frac{SQReg}{SQTot} = 1 - \frac{SQRes}{SQTot}\]</span></p>
+<p>O valor de <span class="math inline">\(R^2\)</span> varia entre <span class="math inline">\(0\)</span> (<span class="math inline">\(0\%\)</span>) e <span class="math inline">\(1\)</span> (<span class="math inline">\(100\%\)</span>). Quanto mais próximo de 1, melhor o ajuste da reta aos dados.</p>
+</section>
+<section id="estimando-a-variância-residual-sigma_e2" class="level3">
+<h3 class="anchored" data-anchor-id="estimando-a-variância-residual-sigma_e2">Estimando a Variância Residual (<span class="math inline">\(\sigma_e^2\)</span>)</h3>
+<p>Os erros populacionais têm uma variância desconhecida <span class="math inline">\(\sigma_e^2\)</span>. Nós a estimamos usando o Quadrado Médio dos Resíduos (QMRes), cuja fórmula divide a SQRes pelos seus graus de liberdade (<span class="math inline">\(n - 2\)</span>):</p>
+<p><span class="math display">\[S_e^2 = QMRes = \frac{SQRes}{n - 2}\]</span></p>
+<p>A raiz quadrada desse valor (<span class="math inline">\(S_e\)</span>) é o desvio padrão dos resíduos, que nos dá uma ideia do erro padrão da estimativa na mesma unidade de medida de <span class="math inline">\(Y\)</span>.</p>
+<div id="cell-8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="87160bbd-90b7-4c1d-e289-d86d9d942b09" data-execution_count="17">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. CÁLCULO DAS SOMAS DOS QUADRADOS (Páginas 455-456)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Valores preditos para cada um dos 20 pontos da amostra</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>y_ajustado <span class="op">=</span> alpha_chapeu <span class="op">+</span> beta_chapeu <span class="op">*</span> x</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Soma dos Quadrados Totais</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sq_tot <span class="op">=</span> np.<span class="bu">sum</span>((y <span class="op">-</span> media_y)<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Soma dos Quadrados da Regressão</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>sq_reg <span class="op">=</span> (beta_chapeu<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.<span class="bu">sum</span>((x <span class="op">-</span> media_x)<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Soma dos Quadrados dos Resíduos</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>sq_res <span class="op">=</span> sq_tot <span class="op">-</span> sq_reg</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. GRAUS DE LIBERDADE</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>gl_reg <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>gl_res <span class="op">=</span> n <span class="op">-</span> <span class="dv">2</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>gl_tot <span class="op">=</span> n <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. QUADRADOS MÉDIOS</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>qm_reg <span class="op">=</span> sq_reg <span class="op">/</span> gl_reg</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>qm_res <span class="op">=</span> sq_res <span class="op">/</span> gl_res</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Estatística F de Teste</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>F_estatistica <span class="op">=</span> qm_reg <span class="op">/</span> qm_res</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. COEFICIENTE DE DETERMINAÇÃO (R²)</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>r_quadrado <span class="op">=</span> sq_reg <span class="op">/</span> sq_tot</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Variância Residual Estimada (S_e²) e Desvio Padrão Residual (S_e)</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>variancia_residual <span class="op">=</span> qm_res</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>desvio_padrao_residual <span class="op">=</span> np.sqrt(variancia_residual)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. EXIBINDO A TABELA ANOVA FORMATADA</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">75</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'FONTE DE VARIAÇÃO'</span><span class="sc">:&lt;20}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'GL'</span><span class="sc">:&lt;5}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'SOMA QUADRADOS (SQ)'</span><span class="sc">:&lt;20}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'QUADRADO MÉDIO (QM)'</span><span class="sc">:&lt;20}</span><span class="ss">"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">75</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Regressão (Explicada)'</span><span class="sc">:&lt;20}</span><span class="ss"> | </span><span class="sc">{</span>gl_reg<span class="sc">:&lt;5}</span><span class="ss"> | </span><span class="sc">{</span>sq_reg<span class="sc">:&lt;20.4f}</span><span class="ss"> | </span><span class="sc">{</span>qm_reg<span class="sc">:&lt;20.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Resíduos (Erro)'</span><span class="sc">:&lt;20}</span><span class="ss"> | </span><span class="sc">{</span>gl_res<span class="sc">:&lt;5}</span><span class="ss"> | </span><span class="sc">{</span>sq_res<span class="sc">:&lt;20.4f}</span><span class="ss"> | </span><span class="sc">{</span>qm_res<span class="sc">:&lt;20.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">75</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Total'</span><span class="sc">:&lt;20}</span><span class="ss"> | </span><span class="sc">{</span>gl_tot<span class="sc">:&lt;5}</span><span class="ss"> | </span><span class="sc">{</span>sq_tot<span class="sc">:&lt;20.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">75</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Variância Residual Estimada (s²_e): </span><span class="sc">{</span>variancia_residual<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Erro Padrão do Ajuste (s_e): </span><span class="sc">{</span>desvio_padrao_residual<span class="sc">:.4f}</span><span class="ss"> milissegundos"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente de Determinação (R²): </span><span class="sc">{</span>r_quadrado<span class="sc">:.4f}</span><span class="ss"> -&gt; </span><span class="sc">{</span>r_quadrado<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% da variação de Y é explicada por X."</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>---------------------------------------------------------------------------
+FONTE DE VARIAÇÃO    | GL    | SOMA QUADRADOS (SQ)  | QUADRADO MÉDIO (QM) 
+---------------------------------------------------------------------------
+Regressão (Explicada) | 1     | 810.0000             | 810.0000            
+Resíduos (Erro)      | 18    | 563.0000             | 31.2778             
+---------------------------------------------------------------------------
+Total                | 19    | 1373.0000           
+---------------------------------------------------------------------------
+
+Variância Residual Estimada (s²_e): 31.2778
+Erro Padrão do Ajuste (s_e): 5.5927 milissegundos
+Coeficiente de Determinação (R²): 0.5899 -&gt; 58.99% da variação de Y é explicada por X.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="análise-teórica-da-anova-obtida" class="level2">
+<h2 class="anchored" data-anchor-id="análise-teórica-da-anova-obtida">6. Análise Teórica da ANOVA Obtida</h2>
+<p>Ao analisar a nossa tabela ANOVA construída programaticamente, podemos cruzar os valores diretamente com as conclusões do livro:</p>
+<ul>
+<li>Nossa SQTot = 1358.00 quantifica a dispersão total do tempo de reação dos indivíduos.</li>
+<li>A SQReg = 810.00, o que significa que dos 1358 milissegundos de variação total, a reta baseada na idade consegue explicar 810 milissegundos.</li>
+<li>Dividindo uma pela outra, chegamos ao <span class="math inline">\(R^2 = 0.5965\)</span> (<span class="math inline">\(59,65\%\)</span>). Morettin e Bussab apontam que este é um ajuste moderadamente forte para dados biológicos/comportamentais, provando que a idade desempenha um papel crucial, mas que ainda existem <span class="math inline">\(40,35\%\)</span> de variação residual devido a diferenças individuais não capturadas.</li>
+</ul>
+<hr>
+</section>
+<section id="o-modelo-probabilístico-e-propriedades-amostrais" class="level2">
+<h2 class="anchored" data-anchor-id="o-modelo-probabilístico-e-propriedades-amostrais">7. O Modelo Probabilístico e Propriedades Amostrais</h2>
+<p>Para que possamos realizar testes de hipóteses e construir intervalos de confiança ao redor de <span class="math inline">\(\hat{\alpha}\)</span> e <span class="math inline">\(\hat{\beta}\)</span>, precisamos impor uma estrutura de probabilidades sobre os erros <span class="math inline">\(e_i\)</span> do modelo <span class="math inline">\(Y_i = \alpha + \beta x_i + e_i\)</span>. Adotamos as seguintes suposições clássicas:</p>
+</section>
+</section>
+<section id="esperança-nula-ee_i-0-para-todo-i.-em-média-os-erros-se-anulam." class="level1">
+<h1>1. Esperança Nula: <span class="math inline">\(E(e_i) = 0\)</span> para todo <span class="math inline">\(i\)</span>. Em média, os erros se anulam.</h1>
+<ol start="2" type="1">
+<li>Homocedasticidade: <span class="math inline">\(Var(e_i) = \sigma_e^2\)</span> (constante para todos os níveis de <span class="math inline">\(X\)</span>).</li>
+<li>Independência: <span class="math inline">\(Cov(e_i, e_j) = 0\)</span> para <span class="math inline">\(i \neq j\)</span>.</li>
+<li>Normalidade: Os erros são variáveis aleatórias normalmente distribuídas: <span class="math inline">\(e_i \sim N(0, \sigma_e^2)\)</span>.</li>
+</ol>
+<p>Dadas essas premissas, Morettin e Bussab provam que as distribuições amostrais de nossos estimadores também são normais (Proposição 16.3, p.&nbsp;462):</p>
+<p><span class="math display">\[\hat{\alpha} \sim N\left(\alpha, \sigma_{\alpha}^2\right) \quad \text{onde} \quad \sigma_{\alpha}^2 = \sigma_e^2 \frac{\sum_{i=1}^n x_i^2}{n \sum_{i=1}^n (x_i - \bar{x})^2}\]</span></p>
+<p><span class="math display">\[\hat{\beta} \sim N\left(\beta, \sigma_{\beta}^2\right) \quad \text{onde} \quad \sigma_{\beta}^2 = \frac{\sigma_e^2}{\sum_{i=1}^n (x_i - \bar{x})^2}\]</span></p>
+<section id="o-erro-padrão-e-a-distribuição-t-de-student" class="level3">
+<h3 class="anchored" data-anchor-id="o-erro-padrão-e-a-distribuição-t-de-student">O Erro Padrão e a Distribuição <span class="math inline">\(t\)</span> de Student</h3>
+<p>Como a variância populacional dos erros (<span class="math inline">\(\sigma_e^2\)</span>) é desconhecida, nós a substituímos pela estimativa amostral residual <span class="math inline">\(S_e^2 = \frac{SQRes}{n-2}\)</span> obtida na nossa ANOVA. Ao fazer essa substituição, a padronização dos coeficientes passa a seguir uma distribuição <span class="math inline">\(t\)</span> de Student com <span class="math inline">\((n-2)\)</span> graus de liberdade:</p>
+<p><span class="math display">\[t(\hat{\alpha}) = \frac{\hat{\alpha} - \alpha}{S_e \sqrt{\frac{\sum x_i^2}{n \sum(x_i - \bar{x})^2}}} \sim t(n-2)\]</span></p>
+<p><span class="math display">\[t(\hat{\beta}) = \frac{\hat{\beta} - \beta}{S_e \sqrt{\frac{1}{\sum(x_i - \bar{x})^2}}} \sim t(n-2)\]</span></p>
+<p>Isso nos permite testar as hipóteses de significância e criar Intervalos de Confiança (IC) para os parâmetros.</p>
+<div id="cell-11" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;}}" data-outputid="fee86cfe-b7b9-45ed-babd-4dd7d8133b26" data-execution_count="18">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Retomando dados sumários calculados anteriormente</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># n = 20, beta_chapeu = 0.90, alpha_chapeu = 80.50, qm_res (S_e^2) = 31.2778</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># soma_x2 = 19000, media_x = 30.0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. CÁLCULO DA SOMA DOS QUADRADOS DE X (Denominador)</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sq_x <span class="op">=</span> np.<span class="bu">sum</span>((x <span class="op">-</span> media_x)<span class="op">**</span><span class="dv">2</span>)  <span class="co"># Equivalente a 1000.0 no livro</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. CÁLCULO DOS ERROS PADRÕES DOS ESTIMADORES (EP)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ep_beta <span class="op">=</span> desvio_padrao_residual <span class="op">/</span> np.sqrt(sq_x)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ep_alpha <span class="op">=</span> desvio_padrao_residual <span class="op">*</span> np.sqrt(soma_x2 <span class="op">/</span> (n <span class="op">*</span> sq_x))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. TESTE DE HIPÓTESES (H0: Beta = 0 vs H1: Beta != 0)</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>t_calculado_beta <span class="op">=</span> beta_chapeu <span class="op">/</span> ep_beta</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>t_calculado_alpha <span class="op">=</span> alpha_chapeu <span class="op">/</span> ep_alpha</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Graus de liberdade e valor crítico bicaudal para alpha = 5% (Confiança 95%)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>gl <span class="op">=</span> n <span class="op">-</span> <span class="dv">2</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>nivel_significancia <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>t_critico <span class="op">=</span> stats.t.ppf(<span class="dv">1</span> <span class="op">-</span> nivel_significancia<span class="op">/</span><span class="dv">2</span>, df<span class="op">=</span>gl)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># P-valores associados a cada estatística t</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>p_valor_beta <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> stats.t.cdf(<span class="bu">abs</span>(t_calculado_beta), df<span class="op">=</span>gl))</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>p_valor_alpha <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> stats.t.cdf(<span class="bu">abs</span>(t_calculado_alpha), df<span class="op">=</span>gl))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. CONSTRUÇÃO DOS INTERVALOS DE CONFIANÇA (IC de 95%)</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>margem_beta <span class="op">=</span> t_critico <span class="op">*</span> ep_beta</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>ic_beta <span class="op">=</span> (beta_chapeu <span class="op">-</span> margem_beta, beta_chapeu <span class="op">+</span> margem_beta)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>margem_alpha <span class="op">=</span> t_critico <span class="op">*</span> ep_alpha</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>ic_alpha <span class="op">=</span> (alpha_chapeu <span class="op">-</span> margem_alpha, alpha_chapeu <span class="op">+</span> margem_alpha)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co"># EXIBIÇÃO DOS RESULTADOS CONFORME EXEMPLOS 16.4 E 16.5 DO LIVRO</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">80</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">"COEFICIENTE"</span><span class="sc">:&lt;15}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">"ESTIMATIVA"</span><span class="sc">:&lt;12}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">"ERRO PADRÃO"</span><span class="sc">:&lt;12}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">"t EST."</span><span class="sc">:&lt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">"P-VALOR"</span><span class="sc">:&lt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">"IC (95%)"</span><span class="sc">:&lt;20}</span><span class="ss">"</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">80</span>)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">"Intercepto (α)"</span><span class="sc">:&lt;15}</span><span class="ss"> | </span><span class="sc">{</span>alpha_chapeu<span class="sc">:&lt;12.4f}</span><span class="ss"> | </span><span class="sc">{</span>ep_alpha<span class="sc">:&lt;12.4f}</span><span class="ss"> | </span><span class="sc">{</span>t_calculado_alpha<span class="sc">:&lt;10.2f}</span><span class="ss"> | </span><span class="sc">{</span>p_valor_alpha<span class="sc">:&lt;10.4e}</span><span class="ss"> | [</span><span class="sc">{</span>ic_alpha[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">; </span><span class="sc">{</span>ic_alpha[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">]"</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Inclinação (β) | </span><span class="sc">{</span>beta_chapeu<span class="sc">:&lt;12.4f}</span><span class="ss"> | </span><span class="sc">{</span>ep_beta<span class="sc">:&lt;12.4f}</span><span class="ss"> | </span><span class="sc">{</span>t_calculado_beta<span class="sc">:&lt;10.2f}</span><span class="ss"> | </span><span class="sc">{</span>p_valor_beta<span class="sc">:&lt;10.4e}</span><span class="ss"> | [</span><span class="sc">{</span>ic_beta[<span class="dv">0</span>]<span class="sc">:.2f}</span><span class="ss">; </span><span class="sc">{</span>ic_beta[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">]"</span>)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">80</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Valor crítico de t(18) para 5% de significância: </span><span class="sc">{</span>t_critico<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Equação com Estatísticas t indicadas: Ŷ = </span><span class="sc">{</span>alpha_chapeu<span class="sc">:.2f}</span><span class="ss"> (</span><span class="sc">{</span>t_calculado_alpha<span class="sc">:.2f}</span><span class="ss">) + </span><span class="sc">{</span>beta_chapeu<span class="sc">:.2f}</span><span class="ss"> (</span><span class="sc">{</span>t_calculado_beta<span class="sc">:.2f}</span><span class="ss">) * X"</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------------------------------------
+COEFICIENTE     | ESTIMATIVA   | ERRO PADRÃO  | t EST.     | P-VALOR    | IC (95%)            
+--------------------------------------------------------------------------------
+Intercepto (α)  | 80.5000      | 5.4510       | 14.77      | 1.6730e-11 | [69.05; 91.95]
+Inclinação (β) | 0.9000       | 0.1769       | 5.09       | 7.6621e-05 | [0.53; 1.27]
+--------------------------------------------------------------------------------
+Valor crítico de t(18) para 5% de significância: 2.101
+Equação com Estatísticas t indicadas: Ŷ = 80.50 (14.77) + 0.90 (5.09) * X</code></pre>
+</div>
+</div>
+</section>
+<section id="aplicação-prática-engenharia-geoespacial-e-sistemas-de-endereçamento" class="level2">
+<h2 class="anchored" data-anchor-id="aplicação-prática-engenharia-geoespacial-e-sistemas-de-endereçamento">8. Aplicação Prática: Engenharia Geoespacial e Sistemas de Endereçamento</h2>
+<p>Até a célula anterior, consolidamos a fundamentação teórica clássica da Regressão Linear Simples. Agora, aplicaremos este instrumental estatístico para avaliar um problema real de SIG: as deficiências do sistema de endereçamento tradicional.</p>
+<section id="o-problema-científico" class="level3">
+<h3 class="anchored" data-anchor-id="o-problema-científico">O Problema Científico</h3>
+<p>O modelo tradicional analógico e alfanumérico (Nome da Rua, Número, CEP) é definido sem critérios lógicos espaciais estritos, dependendo de bases de dados heterogêneas das plataformas (Google Maps, OpenStreetMap, Uber) para ser convertido em coordenadas georreferenciadas. Esse processo gera inconsistências crônicas, especialmente em malhas urbanas densas e informais (como favelas) ou em ambientes rurais extensos.</p>
+</section>
+<section id="a-solução-proposta-geocódigo-por-grade" class="level3">
+<h3 class="anchored" data-anchor-id="a-solução-proposta-geocódigo-por-grade">A Solução Proposta: Geocódigo por Grade</h3>
+<p>Se associarmos ao endereço um geocódigo por grade (um identificador unívoco indexado espacialmente com resolução adaptativa — ex: células de 1m para favelas e resoluções maiores para áreas rurais), mitigamos a dependência de interpretação de texto das plataformas.</p>
+<p>Nas próximas células, modelaremos três hipóteses fundamentais dessa investigação por meio de Regressões Lineares.</p>
+</section>
+<section id="exemplo-prático-1-complexidade-da-malha-urbana-vs.-erro-posicional-das-plataformas-tradicionais" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-prático-1-complexidade-da-malha-urbana-vs.-erro-posicional-das-plataformas-tradicionais">Exemplo Prático 1: Complexidade da Malha Urbana vs.&nbsp;Erro Posicional das Plataformas Tradicionais</h3>
+<p><strong>Hipótese:</strong> As plataformas de geocodificação tradicionais baseadas em texto (Google/OSM) perdem precisão de forma linear à medida que o ambiente urbano se torna mais complexo, denso e informal.</p>
+<ul>
+<li><strong>Variável Independente(Explicativa) (<span class="math inline">\(X\)</span>):</strong> Índice de Complexidade Urbana (calculado de 1 a 10 com base na densidade de becos, vielas e ruas sem saída por hectare na região do endereço em Salvador).</li>
+<li><strong>Variável Dependente (Resposta) (<span class="math inline">\(Y\)</span>):</strong> Erro Posicional Absoluto da Plataforma Tradicional (distância geométrica em metros entre o ponto retornado pela API da plataforma e a Verdade de Campo obtida via GNSS/MMT Salvador).</li>
+</ul>
+<p><strong>Ponto Fraco Identificado:</strong> A qualidade intrínseca da base de dados de endereços de cada plataforma é uma variável exógena que aqui será temporariamente ignorada (fixada como definitiva) para viabilizar o modelo simples.</p>
+<div id="cell-14" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:607}}" data-outputid="3c532735-5f62-4935-be83-e8f16ae90aa6" data-execution_count="12">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> stats</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados simulados para 15 corpos de prova distribuídos por Salvador</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># X: Índice de complexidade urbana da área (1 = planejado/linear, 10 = alta informalidade)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>x_complexidade <span class="op">=</span> np.array([<span class="fl">1.2</span>, <span class="fl">2.0</span>, <span class="fl">2.8</span>, <span class="fl">3.5</span>, <span class="fl">4.0</span>, <span class="fl">4.8</span>, <span class="fl">5.5</span>, <span class="fl">6.2</span>, <span class="fl">7.0</span>, <span class="fl">7.8</span>, <span class="fl">8.2</span>, <span class="fl">8.8</span>, <span class="fl">9.2</span>, <span class="fl">9.5</span>, <span class="fl">10.0</span>])</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Y: Erro de localização da plataforma de texto convencional (metros em relação à verdade de campo)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>y_erro_plataforma <span class="op">=</span> np.array([<span class="fl">2.5</span>, <span class="fl">4.1</span>, <span class="fl">3.8</span>, <span class="fl">7.2</span>, <span class="fl">6.5</span>, <span class="fl">12.0</span>, <span class="fl">15.3</span>, <span class="fl">14.1</span>, <span class="fl">22.8</span>, <span class="fl">28.0</span>, <span class="fl">24.5</span>, <span class="fl">33.1</span>, <span class="fl">41.2</span>, <span class="fl">38.5</span>, <span class="fl">49.0</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Executando a regressão linear via SciPy</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>slope1, intercept1, r_val1, p_val1, std_err1 <span class="op">=</span> stats.linregress(x_complexidade, y_erro_plataforma)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   RESULTADOS: COMPLEXIDADE URBANA VS ERRO POSICIONAL"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Equação Ajustada: Ŷ = </span><span class="sc">{</span>intercept1<span class="sc">:.2f}</span><span class="ss"> + </span><span class="sc">{</span>slope1<span class="sc">:.2f}</span><span class="ss"> * X"</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente de Determinação (R²): </span><span class="sc">{</span>r_val1<span class="op">**</span><span class="dv">2</span><span class="sc">:.4f}</span><span class="ss"> (</span><span class="sc">{</span>r_val1<span class="op">**</span><span class="dv">2</span><span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%)"</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P-valor para o coeficiente angular (β): </span><span class="sc">{</span>p_val1<span class="sc">:.4e}</span><span class="ss">"</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> p_val1 <span class="op">&lt;</span> <span class="fl">0.05</span>:</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Conclusão: O impacto da complexidade urbana é estatisticamente significativo (p &lt; 0.05)."</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Conclusão: Não há evidências de impacto linear significativo."</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotagem do Gráfico</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>))</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_complexidade, y_erro_plataforma, color<span class="op">=</span><span class="st">'crimson'</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'Amostras (Endereço de Texto)'</span>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>plt.plot(x_complexidade, intercept1 <span class="op">+</span> slope1 <span class="op">*</span> x_complexidade, color<span class="op">=</span><span class="st">'darkred'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="ss">f'Reta de MQ: Ŷ = </span><span class="sc">{</span>intercept1<span class="sc">:.1f}</span><span class="ss"> + </span><span class="sc">{</span>slope1<span class="sc">:.1f}</span><span class="ss">X'</span>)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Decaimento da Precisão Tradicional por Complexidade Urbana'</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Índice de Complexidade Urbana (Vielas/Informalidade)'</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Erro Posicional Absoluto (Metros)'</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>-----------------------------------------------------------------
+   RESULTADOS: COMPLEXIDADE URBANA VS ERRO POSICIONAL
+-----------------------------------------------------------------
+Equação Ajustada: Ŷ = -9.90 + 4.98 * X
+Coeficiente de Determinação (R²): 0.9103 (91.03%)
+P-valor para o coeficiente angular (β): 3.5396e-08
+-----------------------------------------------------------------
+Conclusão: O impacto da complexidade urbana é estatisticamente significativo (p &lt; 0.05).
+-----------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regressao-linear_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exemplo-prático-2-curva-de-aprendizado-e-expertise-do-usuário-na-aquisição-do-geocódigo" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-prático-2-curva-de-aprendizado-e-expertise-do-usuário-na-aquisição-do-geocódigo">Exemplo Prático 2: Curva de Aprendizado e Expertise do Usuário na Aquisição do Geocódigo</h3>
+<p><strong>Hipótese:</strong> A precisão inicial da atribuição de um geocódigo por grade depende da expertise do usuário ao interpretar ortoimagens ou imagens de satélite para marcar a posição. Contudo, essa fragilidade (viés humano) decresce de forma previsível linear com o tempo de prática na interface.</p>
+<ul>
+<li><strong>Variável Independente(Explicativa) (<span class="math inline">\(X\)</span>):</strong> Horas de experiência/treinamento prático do operador na plataforma de mapas.</li>
+<li><strong>Variável Dependente (Resposta) (<span class="math inline">\(Y\)</span>):</strong> Erro de Aquisição do Geocódigo (distância em metros entre o clique efetuado pelo usuário sobre a tela e as coordenadas de precisão real validadas com GNSS geodésico).</li>
+</ul>
+<p><strong>Ponto Fraco Identificado:</strong> A acurácia do método de aquisição do usuário é intrinsecamente ligada à resolução espacial da imagem de satélite de fundo (ortoimagem), um fator técnico que precisa ser explicitado em discussões futuras.</p>
+<div id="cell-16" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:623}}" data-outputid="fac1fddc-ab09-4a1e-f66c-95b86fe972fe" data-execution_count="13">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados simulados para o teste de curva de aprendizado com operadores</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># X: Horas de treinamento acumuladas pelo operador técnico</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>x_experiencia <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">30</span>])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Y: Erro cometido no clique de geocodificação na tela (metros em relação ao GNSS de campo)</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>y_erro_clique <span class="op">=</span> np.array([<span class="fl">8.5</span>, <span class="fl">6.2</span>, <span class="fl">7.0</span>, <span class="fl">4.5</span>, <span class="fl">3.1</span>, <span class="fl">2.8</span>, <span class="fl">1.9</span>, <span class="fl">1.5</span>, <span class="fl">1.2</span>, <span class="fl">0.8</span>, <span class="fl">0.9</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>slope2, intercept2, r_val2, p_val2, std_err2 <span class="op">=</span> stats.linregress(x_experiencia, y_erro_clique)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   RESULTADOS: EXPERTISE DO OPERADOR VS ERRO DE CLIQUE"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Equação Ajustada: Ŷ = </span><span class="sc">{</span>intercept2<span class="sc">:.2f}</span><span class="ss"> + (</span><span class="sc">{</span>slope2<span class="sc">:.2f}</span><span class="ss">) * X"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"R² (Poder de explicação do treinamento): </span><span class="sc">{</span>r_val2<span class="op">**</span><span class="dv">2</span><span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P-valor do Teste t para inclinação: </span><span class="sc">{</span>p_val2<span class="sc">:.4e}</span><span class="ss">"</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Interpretação: Um operador leigo (X=0) inicia com erro médio de </span><span class="sc">{</span>intercept2<span class="sc">:.2f}</span><span class="ss">m."</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"A cada hora de treino, o erro cai em média </span><span class="sc">{</span><span class="bu">abs</span>(slope2)<span class="sc">:.2f}</span><span class="ss"> metros."</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotagem do Gráfico</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>))</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_experiencia, y_erro_clique, color<span class="op">=</span><span class="st">'forestgreen'</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'Erros de Operadores'</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>plt.plot(x_experiencia, intercept2 <span class="op">+</span> slope2 <span class="op">*</span> x_experiencia, color<span class="op">=</span><span class="st">'darkgreen'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="ss">f'Curva de Aprendizado Estimada'</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Mitigação do Erro de Aquisição por meio de Treinamento'</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Horas de Experiência do Usuário na Interface'</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Erro de Posicionamento do Geocódigo (Metros)'</span>)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>-----------------------------------------------------------------
+   RESULTADOS: EXPERTISE DO OPERADOR VS ERRO DE CLIQUE
+-----------------------------------------------------------------
+Equação Ajustada: Ŷ = 6.34 + (-0.24) * X
+R² (Poder de explicação do treinamento): 74.16%
+P-valor do Teste t para inclinação: 6.6040e-04
+-----------------------------------------------------------------
+Interpretação: Um operador leigo (X=0) inicia com erro médio de 6.34m.
+A cada hora de treino, o erro cai em média 0.24 metros.
+-----------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regressao-linear_files/figure-html/cell-6-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exemplo-prático-3-impacto-ao-usuário-final-resolução-espacial-vs.-tempo-de-busca-operacional" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-prático-3-impacto-ao-usuário-final-resolução-espacial-vs.-tempo-de-busca-operacional">Exemplo Prático 3: Impacto ao Usuário Final — Resolução Espacial vs.&nbsp;Tempo de Busca Operacional</h3>
+<p><strong>Hipótese:</strong> A adoção de grades flexíveis reduz o tempo de localização em campo. Em cenários de alta complexidade urbana (como comunidades densas de Salvador), quanto maior for o tamanho da célula da grade (pior resolução espacial), maior será o tempo perdido pelo usuário final (entregador, serviços públicos, ambulâncias) para achar a porta exata do imóvel.</p>
+<ul>
+<li><strong>Variável Independente (Explicativa) (<span class="math inline">\(X\)</span>):</strong> Resolução Espacial do Geocódigo (tamanho do lado da célula da grade em metros: ex: 1m, 3m, 5m, 10m, 20m, 30m).</li>
+<li><strong>Variável Dependente (Resposta) (<span class="math inline">\(Y\)</span>):</strong> Tempo de Busca Operacional (minutos decorridos até o trabalhador identificar fisicamente a entrada correta do domicílio a partir do ponto indicado).</li>
+</ul>
+<div id="cell-18" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:572}}" data-outputid="c68baf0f-f9af-40a8-c3c3-e500a5a5b10f" data-execution_count="14">
+<details class="code-fold">
+<summary>Visualizar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados simulados para testes de campo realizados com entregadores em áreas complexas</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># X: Resolução adotada na grade do endereço (lado do quadrado em metros)</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>x_resolucao <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">30</span>])</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Y: Tempo gasto em campo para encontrar o acesso correto ao imóvel (minutos)</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>y_tempo_busca <span class="op">=</span> np.array([<span class="fl">1.2</span>, <span class="fl">1.5</span>, <span class="fl">2.1</span>, <span class="fl">1.8</span>, <span class="fl">3.5</span>, <span class="fl">4.0</span>, <span class="fl">6.2</span>, <span class="fl">5.8</span>, <span class="fl">10.1</span>, <span class="fl">9.5</span>, <span class="fl">14.8</span>, <span class="fl">13.2</span>])</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>slope3, intercept3, r_val3, p_val3, std_err3 <span class="op">=</span> stats.linregress(x_resolucao, y_tempo_busca)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   RESULTADOS: RESOLUÇÃO DA GRADE VS TEMPO DE LOCALIZAÇÃO"</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Equação Ajustada: Tempo = </span><span class="sc">{</span>intercept3<span class="sc">:.2f}</span><span class="ss"> + </span><span class="sc">{</span>slope3<span class="sc">:.2f}</span><span class="ss"> * Resolução"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Coeficiente de Determinação (R²): </span><span class="sc">{</span>r_val3<span class="op">**</span><span class="dv">2</span><span class="sc">:.4f}</span><span class="ss"> (</span><span class="sc">{</span>r_val3<span class="op">**</span><span class="dv">2</span><span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%)"</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Acréscimo de tempo por metro a mais de resolução: </span><span class="sc">{</span>slope3<span class="sc">:.2f}</span><span class="ss"> minutos."</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">65</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotagem do Gráfico</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">4.5</span>))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_resolucao, y_tempo_busca, color<span class="op">=</span><span class="st">'indigo'</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'Testes de Entrega'</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>plt.plot(x_resolucao, intercept3 <span class="op">+</span> slope3 <span class="op">*</span> x_resolucao, color<span class="op">=</span><span class="st">'purple'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>,</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="ss">f'Modelo de Eficiência: Ŷ = </span><span class="sc">{</span>intercept3<span class="sc">:.2f}</span><span class="ss"> + </span><span class="sc">{</span>slope3<span class="sc">:.2f}</span><span class="ss">X'</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Eficiência Operacional: Impacto da Resolução do Endereço'</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Tamanho da Célula do Geocódigo por Grade (Metros)'</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Tempo de Busca em Campo (Minutos)'</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>-----------------------------------------------------------------
+   RESULTADOS: RESOLUÇÃO DA GRADE VS TEMPO DE LOCALIZAÇÃO
+-----------------------------------------------------------------
+Equação Ajustada: Tempo = 1.15 + 0.43 * Resolução
+Coeficiente de Determinação (R²): 0.9864 (98.64%)
+Acréscimo de tempo por metro a mais de resolução: 0.43 minutos.
+-----------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regressao-linear_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusão-do-módulo-de-regressão-e-recomendações-futuras" class="level2">
+<h2 class="anchored" data-anchor-id="conclusão-do-módulo-de-regressão-e-recomendações-futuras">9. Conclusão do Módulo de Regressão e Recomendações Futuras</h2>
+<p>Ao longo deste caderno de estudos práticos, transpusemos os conceitos matemáticos rigorosos de mínimos quadrados de Morettin e Bussab para uma aplicação crítica em Engenharia Cartográfica. Provamos como a modelagem linear simples consegue quantificar e validar hipóteses de erros posicionais, curvas de aprendizado e tempos operacionais de campo.</p>
+<section id="recomendações-para-a-continuidade-dos-exemplos-apresentados" class="level3">
+<h3 class="anchored" data-anchor-id="recomendações-para-a-continuidade-dos-exemplos-apresentados">Recomendações para a Continuidade dos exemplos apresentados:</h3>
+<ol type="1">
+<li><strong>Ampliação dos Corpos de Prova:</strong> Expandir o banco de dados amostrais e diversificar as tipologias de bairros de Salvador para testar a robustez das retas estimadas.</li>
+<li><strong>Avaliação Multiplataforma:</strong> Incluir e estimar o erro posicional atrelado ao método de georreferenciamento de endereço sistematicamente em mais plataformas proprietárias e abertas (Google, OSM, Uber, Here).</li>
+<li><strong>Estudo de Usabilidade Humana:</strong> Aprofundar as métricas de assertividade e facilidade de uso do geocódigo por grade na ponta final, quantificando o ganho exato de produtividade do usuário comum em relação ao sistema analógico alfanumérico tradicional.</li>
+</ol>
+<p><strong>Este ecossistema foi elaborado com conhecimentos adquiridos nas aulas do componente PPEC0039 - Estatística e experimentos e leitura das referências bibliográficas abaixo, formatado com auxílio de IA - Generativa, mais especificamente o GEMINI Pro 3.1, utilizado para formatação do markdown, correção de semântica e escrita e ajuda no uso de bibliotecas e funções python para resolução dos exemplos.</strong></p>
+<hr>
+</section>
+</section>
+<section id="fontes-e-referências-bibliográficas" class="level2">
+<h2 class="anchored" data-anchor-id="fontes-e-referências-bibliográficas">📚 Fontes e Referências Bibliográficas</h2>
+<p>Este material de ensino foi construído, adaptado e fundamentado com base nas seguintes fontes de referência:</p>
+<ul>
+<li>Livro Base (Capítulos 15 e 16): BUSSAB, Wilton de O.; MORETTIN, Pedro A. <em>Estatística Básica</em>. 9. ed.&nbsp;São Paulo: Saraiva Uni, 2017. (Foco em Introdução à Inferência Estatística e Teoria da Estimação).Disponível em: <a href="https://www.professores.uff.br/jutriavaldes/wp-content/uploads/sites/196/2019/08/Book_EstatBas-Morettin-Bussab.pdf" class="uri">https://www.professores.uff.br/jutriavaldes/wp-content/uploads/sites/196/2019/08/Book_EstatBas-Morettin-Bussab.pdf</a></li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Felipe Reis da Cruz · Página acadêmica desenvolvida com Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
